@@ -6,7 +6,7 @@ int main(){
     fl.push_front(2);
     fl.push_front(3);
     for(auto it = fl.begin();it != fl.end();++it){
-        std::cout << *it << " " << std::endl;
+        std ::cout << *it << " " << std::endl;
     }
     std::cin.get();
     return 0;
