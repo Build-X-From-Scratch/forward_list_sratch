@@ -1,34 +1,31 @@
-# Prerequisites
-*.d
+# Build directories
+build/
+cmake-build-*/
+out/
+Release/
+Debug/
+
+# Binary output (keep bin structure but ignore contents during development)
+bin/*.exe
+bin/*.a
+bin/*.lib
+bin/*.so
+bin/*.dylib
+bin/test_*
+bin/forward_list*
+bin/ForwardList*
 
 # Compiled Object files
-*.slo
-*.lo
 *.o
 *.obj
-
-# Precompiled Headers
-*.gch
-*.pch
-
-# Linker files
-*.ilk
-
-# Debugger Files
-*.pdb
+*.elf
 
 # Compiled Dynamic libraries
 *.so
 *.dylib
 *.dll
 
-# Fortran module files
-*.mod
-*.smod
-
 # Compiled Static libraries
-*.lai
-*.la
 *.a
 *.lib
 
@@ -37,5 +34,85 @@
 *.out
 *.app
 
-# debug information files
-*.dwo
+# CMake generated files
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+install_manifest.txt
+CTestTestfile.cmake
+_deps/
+CMakeScripts/
+
+# Makefiles
+Makefile
+makefile
+
+# IDE and Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+*.user
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+*.sln
+*.suo
+
+# System files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+*.log
+*.bak
+*.backup
+*.orig
+
+# Package managers
+conan.lock
+vcpkg_installed/
+
+# Testing and coverage
+*.gcov
+*.gcno
+*.gcda
+coverage/
+lcov.info
+
+# Documentation build
+docs/_build/
+docs/html/
+docs/latex/
+
+# Archives
+*.zip
+*.tar.gz
+*.rar
+*.7z
+
+# Local environment
+.env
+.env.local
+
+# Clang tools
+compile_commands.json
+.clangd/
+.cache/
+
+# Visual Studio Code
+.vscode/settings.json
+.vscode/tasks.json
+.vscode/launch.json
+.vscode/c_cpp_properties.json
+
+# Keep important empty directories
+!bin/.gitkeep
