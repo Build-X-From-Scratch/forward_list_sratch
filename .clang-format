@@ -1,0 +1,42 @@
+---
+# .clang-format - Konfigurasi untuk clang-format
+BasedOnStyle: Google
+
+# Indentation
+IndentWidth: 4
+TabWidth: 4
+UseTab: Never
+IndentCaseLabels: true
+IndentPPDirectives: BeforeHash
+
+# Line breaking
+ColumnLimit: 100
+BreakBeforeBraces: Attach
+AllowShortFunctionsOnASingleLine: Empty
+AllowShortIfStatementsOnASingleLine: false
+AllowShortLoopsOnASingleLine: false
+
+# Spacing
+SpaceAfterCStyleCast: false
+SpaceBeforeParens: ControlStatements
+SpaceInEmptyParentheses: false
+SpacesInAngles: false
+SpacesInCStyleCastParentheses: false
+SpacesInParentheses: false
+SpacesInSquareBrackets: false
+
+# Alignment
+AlignOperands: true
+AlignTrailingComments: true
+AlignConsecutiveAssignments: false
+
+# Other formatting options
+SortIncludes: true
+FixNamespaceComments: true
+ReflowComments: true
+
+# C++ specific
+Standard: c++17
+DerivePointerAlignment: false
+PointerAlignment: Left
+ReferenceAlignment: Left
