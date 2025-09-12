@@ -1,5 +1,7 @@
 #include <iostream>
 #include <initializer_list>
+#include <type_traits>
+#include <iterator>
 #ifndef __forwardList
 #define __forwardList
 template <typename T>
@@ -17,8 +19,9 @@ class forward_lists{
         Node* head;
     public:
         forward_lists(){
-            this->head = nullptr;
-            this->size = 0;
+            this->head = new Node();
+            this->head->next = nullptr;
+            this->size = 1;
         }
         /**
          * @brief initializer list constructor
@@ -77,9 +80,10 @@ class forward_lists{
             private:
                 Node* node;
             public:
-                Iterator(Node* n){
-                    this->node = n;
-                }   
+            Iterator(Node* n){
+                this->node = n;
+            }   
+            friend std::ostream& operator<<(std::ostream& os,const Iterator& it);
                 T& operator*(){
                     return node->data;
                 }
@@ -97,17 +101,23 @@ class forward_lists{
                 }
         };
     public: //inialisasi Iterator
-        Iterator begin(){
+        Iterator before_begin(){
             return Iterator(head);
+        }
+        Iterator begin(){
+            return Iterator(head->next);
         }
         Iterator end(){
             return Iterator(nullptr);
         }
         Iterator cbegin()const{
-            return Iterator(head);
+            return Iterator(head->next);
         }
         Iterator cend()const{
             return Iterator(nullptr);
+        }
+        Iterator Cbefore_begin()const{
+            return Iterator(head);
         }
     public: //getter
         T front(){
@@ -167,11 +177,39 @@ class forward_lists{
                 curr->next = new_node;
             }
         }
-        // void insert_after(Iterator begin,T itr1,T itr2){
-        //     for(auto it = itr1; it != itr2;++it){
-        //         auto value =  *it;//deferencing
-        //     }
-        // }
+        template<typename pos>
+        void insert_after(Iterator iter_position,pos itr1,pos itr2){
+            using category = typename std::iterator_traits<pos>::iterator_category;
+            static_assert(
+                std::is_base_of_v<std::input_iterator_tag,category>,
+                "parameter harus iterator"
+            );
+            Node* curr = iter_position;
+            Node* new_node = new Node(*itr1);
+            Node* tail = new_node;
+            ++itr1;
+            while(itr1 != itr2){
+                Node* n_node = new_node(*itr1);
+                ++itr1;
+                tail->next = n_node;
+                tail = n_node;
+            }
+            tail->next = curr->next;
+            curr->next = new_node;
+        }
+        void insert_after(Iterator iter_position,Iterator listBegin,Iterator listEnd){
+            Node* curr = iter_position;
+            Node* new_node = new Node(*listBegin);
+            Node* tail = new_node;
+            ++listBegin;
+            while(listBegin != listEnd){
+                Node* n_node = new_node(*listBegin);
+                tail->next = n_node;
+                tail = n_node;
+            }
+            tail->next = curr->next;
+            curr->next = new_node;
+        }
     public:
         void print_all(Iterator begin,Iterator end){
             while(begin != end){
@@ -188,5 +226,9 @@ class forward_lists{
             }
         }
 };
-
+template<typename T>
+std::ostream& operator<<(std::ostream& os,const typename forward_lists<T>::Iterator& it){
+    os << *it; //deferencing it
+    return os;
+}
 #endif
