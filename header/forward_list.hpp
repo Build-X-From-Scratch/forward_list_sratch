@@ -1,4 +1,5 @@
 #include <iostream>
+#include <initializer_list>
 #ifndef __forwardList
 #define __forwardList
 template <typename T>
@@ -18,6 +19,20 @@ class forward_lists{
         forward_lists(){
             this->head = nullptr;
             this->size = 0;
+        }
+        /**
+         * @brief initializer list constructor
+         * @details
+         */
+        forward_lists(std::initializer_list<T> arr): head(nullptr){
+            Node** curr = &head; //store alamat memory head ke curr
+            for(const T& it: arr){
+                *curr = new Node(it); //deference pointer
+                //head = new Node(it) ->meaning
+                curr = &((*curr)->next); //store alamat curr->next
+               //curr = head->next
+               //curr selalu menunjuk ke posisi kosong
+            }   
         }
         //copy constructor
         forward_lists(const forward_lists& others){
@@ -62,22 +77,22 @@ class forward_lists{
             private:
                 Node* node;
             public:
-                Iterator(Node n){
+                Iterator(Node* n){
                     this->node = n;
                 }   
-                Iterator& operator*(){
+                T& operator*(){
                     return node->data;
                 }
-                T& operator++(){
+                Iterator& operator++(){ //harus mengembalikan reference ke object saat ini
                     if(node) node = node->next;
                     return *this;
                 }
-                Iterator& operator++(int){
+                Iterator operator++(int){ //harus mengambalikan salin bukan referensi
                     Iterator temp = *this; //simpan keadaan sebelum di geser
                     ++(*this);//geser
                     return temp; //kembalikan keadaan sebelum di geser
                 }
-                bool operator!=(const Iterator& others){
+                bool operator!=(const Iterator& others)const{
                     return node != others.node;
                 }
         };
@@ -140,13 +155,14 @@ class forward_lists{
                 curr->next = new_node;
             }else{
                 Node* new_node = new Node(val);
-                Node* temp = new_node;
-                for(int i = 0;i < n;i++){
-                    Node* n_node = new Node(val);
-                    new_node->next = n_node;
+                Node* tail = new_node;
+                for(int i = 0;i < n - 1;i++){
+                    Node* baru = new Node(val);
+                    tail->next = baru;
+                    tail = baru;
                 }
-                new_node->next = curr->next;
-                curr->next = temp;
+                tail->next = curr->next; 
+                curr->next = new_node;
             }
         }
     public:
