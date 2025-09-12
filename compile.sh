@@ -1,47 +1,18 @@
 #!/bin/zsh
-set -e
-compile_head(){
-    echo "Sedang mengkompilasi header..."
-    # Asumsi Anda berada di direktori utama, pindah ke 'header'
-    cd header
-    clang++ -c forward_list.hpp -o ../bin/header.o
-    # Kembali ke direktori utama
-    cd ..
-}
-compile_imp(){
-    echo "direktori saat ini $pwd"
-    echo "Sedang mengkompilasi implementasi..."
-    # Asumsi Anda berada di direktori utama, pindah ke 'implementation'
-    cd implementation
-    clang++ -c implementation.cpp -o ../bin/imp.o
-    # Kembali ke direktori utama
-    cd ..
-}
+set -euo pipefail
 
-linking(){
-    echo "Sedang melakukan proses linking..."
-    # Gunakan path yang benar ke file objek
-    clang++ ./bin/header.o ./bin/imp.o -o ./bin/res
-}
+CXX=clang++
+# ZSH: pakai array agar tiap flag jadi argumen terpisah
+CXXFLAGS=(-std=c++20 -O2 -Wall -Wextra -pedantic -Iheader)
+BIN_DIR=bin
 
-jalankan(){
-    echo "Menyelesaikan semua kompilasi."
-    echo "Direktori saat ini: "
-    pwd
-    echo "Menjalankan program..."
-    clear
-    # Panggil file executable yang berada di direktori 'bin'
-    ./bin/res
-}
-run(){
-    # Buat direktori 'bin' jika belum ada
-    if [ ! -d "bin" ]; then
-        mkdir bin
-    fi
-    compile_head
-    compile_imp
-    linking
-    jalankan
-}
-# Mulai eksekusi
-run
+mkdir -p "$BIN_DIR"
+
+echo "Sedang mengkompilasi implementation (dengan header)..."
+$CXX $CXXFLAGS -c implementation/implementation.cpp -o "$BIN_DIR/imp.o"
+
+echo "Sedang melakukan proses linking..."
+$CXX $CXXFLAGS "$BIN_DIR/imp.o" -o "$BIN_DIR/res"
+
+echo "Menjalankan program..."
+"./$BIN_DIR/res"

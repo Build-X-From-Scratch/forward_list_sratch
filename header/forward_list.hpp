@@ -103,6 +103,12 @@ class forward_lists{
         Iterator end(){
             return Iterator(nullptr);
         }
+        Iterator cbegin()const{
+            return Iterator(head);
+        }
+        Iterator cend()const{
+            return Iterator(nullptr);
+        }
     public: //getter
         T front(){
             return head->data;
@@ -126,11 +132,9 @@ class forward_lists{
         /**
          * @brief insert after
          */
-        void insert_after(T begin,T val){
-            Node* curr = head;
-            while(curr != val){
-                curr = curr->next;
-            }
+        void insert_after(Iterator iter_position,T val){
+            Node* curr = iter_position;
+            ++curr; //pre increment
             if(curr == nullptr){
                 return;
             }
@@ -138,11 +142,9 @@ class forward_lists{
             new_node->next = curr->next;
             curr->next  = new_node;
         }   
-        void insert_after(T begin,int n,T val){
-            Node* curr = head;
-            while(curr != nullptr){
-                curr = curr->next;
-            }
+        void insert_after(Iterator Iterator_position,int n,T val){
+            Node* curr = Iterator_position;
+            ++curr;
             if(curr == nullptr){
                 return;
             }
@@ -165,8 +167,13 @@ class forward_lists{
                 curr->next = new_node;
             }
         }
+        // void insert_after(Iterator begin,T itr1,T itr2){
+        //     for(auto it = itr1; it != itr2;++it){
+        //         auto value =  *it;//deferencing
+        //     }
+        // }
     public:
-        void print_all(T begin,T end){
+        void print_all(Iterator begin,Iterator end){
             while(begin != end){
                 std::cout << *begin << " ";
                 ++begin;
