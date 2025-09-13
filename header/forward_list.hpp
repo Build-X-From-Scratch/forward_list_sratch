@@ -10,16 +10,16 @@ class forward_lists{
         struct Node{
             T data;
             Node* next;
-            Node(const T& data){
+            Node(const T& data = T{},Node* n = nullptr){
                 this->data = data;
-                this->next = nullptr;
+                this->next = n;
             }
         };
         int size;
         Node* head;
     public:
         forward_lists(){
-            this->head = new Node();
+            this->head = new Node(0);
             this->head->next = nullptr;
             this->size = 1;
         }
@@ -83,13 +83,23 @@ class forward_lists{
             Iterator(Node* n){
                 this->node = n;
             }   
-            friend std::ostream& operator<<(std::ostream& os,const Iterator& it);
+            friend std::ostream& operator<<(std::ostream& os,const Iterator& it){
+                if(it.node){
+                    os << it.node->data;
+                }else{
+                    os << "no output";
+                }
+                return os;
+            }
                 T& operator*(){
                     return node->data;
                 }
                 Iterator& operator++(){ //harus mengembalikan reference ke object saat ini
                     if(node) node = node->next;
                     return *this;
+                }
+                Iterator& operator->(){
+                    return node;
                 }
                 Iterator operator++(int){ //harus mengambalikan salin bukan referensi
                     Iterator temp = *this; //simpan keadaan sebelum di geser
@@ -98,6 +108,9 @@ class forward_lists{
                 }
                 bool operator!=(const Iterator& others)const{
                     return node != others.node;
+                }
+                Node* get_raw()const{
+                    return node;
                 }
         };
     public: //inialisasi Iterator
@@ -116,7 +129,7 @@ class forward_lists{
         Iterator cend()const{
             return Iterator(nullptr);
         }
-        Iterator Cbefore_begin()const{
+        Iterator cbefore_begin()const{
             return Iterator(head);
         }
     public: //getter
@@ -143,7 +156,7 @@ class forward_lists{
          * @brief insert after
          */
         void insert_after(Iterator iter_position,T val){
-            Node* curr = iter_position;
+            Node* curr = iter_position.get_raw();
             ++curr; //pre increment
             if(curr == nullptr){
                 return;
@@ -153,7 +166,7 @@ class forward_lists{
             curr->next  = new_node;
         }   
         void insert_after(Iterator Iterator_position,int n,T val){
-            Node* curr = Iterator_position;
+            Node* curr = Iterator_position.get_raw();
             ++curr;
             if(curr == nullptr){
                 return;
@@ -184,7 +197,7 @@ class forward_lists{
                 std::is_base_of_v<std::input_iterator_tag,category>,
                 "parameter harus iterator"
             );
-            Node* curr = iter_position;
+            Node* curr = iter_position.get_raw();
             Node* new_node = new Node(*itr1);
             Node* tail = new_node;
             ++itr1;
@@ -198,7 +211,7 @@ class forward_lists{
             curr->next = new_node;
         }
         void insert_after(Iterator iter_position,Iterator listBegin,Iterator listEnd){
-            Node* curr = iter_position;
+            Node* curr = iter_position.get_raw();
             Node* new_node = new Node(*listBegin);
             Node* tail = new_node;
             ++listBegin;
@@ -206,9 +219,29 @@ class forward_lists{
                 Node* n_node = new_node(*listBegin);
                 tail->next = n_node;
                 tail = n_node;
+                ++listBegin;
             }
             tail->next = curr->next;
             curr->next = new_node;
+        }
+    public://overload erase after
+        void erase_after(Iterator iter_position){
+            Node* curr = iter_position.get_raw();
+            Node* temp = curr;
+            ++curr; //curr = curr->next,gerakkan curr
+            Node* dlt = curr;
+            ++curr;//curr = curr->next,gerakkan curr
+            delete dlt;
+            temp->next = curr;
+        }
+        void erase_after(Iterator pos_begin,Iterator pos_end){
+            Node* curr = pos_begin.get_raw();
+            curr = curr->next;
+            while(curr != pos_end){
+                Node* temp = curr;
+                curr = curr->next;
+                delete temp;
+            }
         }
     public:
         void print_all(Iterator begin,Iterator end){
@@ -226,9 +259,4 @@ class forward_lists{
             }
         }
 };
-template<typename T>
-std::ostream& operator<<(std::ostream& os,const typename forward_lists<T>::Iterator& it){
-    os << *it; //deferencing it
-    return os;
-}
 #endif

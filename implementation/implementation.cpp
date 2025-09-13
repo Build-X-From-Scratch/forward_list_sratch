@@ -14,10 +14,16 @@ int main(){
     for(auto it = fl.begin(); it != fl.end(); ++it) {
         std::cout << *it << " ";
     }
+    std::cout << std::endl;
     //================ Tanpa deferencing ===============
     for(auto it = fl.begin();it != fl.end();++it){
         std::cout << it << " ";
     }
+    std::cout << std::endl;
+    //================insert_after=======================
+    fl.insert_after(fl.begin(),3,4);
+    std::cout << "Proses insert_after 1" << std::endl;
+    fl.print_all(fl.begin(),fl.end());
     std::cin.get();
     return 0;
 }   
