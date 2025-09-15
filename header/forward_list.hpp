@@ -21,7 +21,7 @@ class forward_lists{
         forward_lists(){
             this->head = new Node(T{});
             this->head->next = nullptr;
-            this->size = 1;
+            this->size = 0;
         }
         /**
          * @brief initializer list constructor
@@ -142,6 +142,12 @@ class forward_lists{
         }
         int get_size(){
             return this->size;
+        }
+        bool is_empty(){
+            if(size == 0){
+                return true;
+            }
+            return false;
         }
     public:
         void push_front(const T&& data){

@@ -6,6 +6,8 @@ Release/
 Debug/
 # bin
 bin
+# build
+build
 # Binary output (keep bin structure but ignore contents during development)
 bin/*.exe
 bin/*.a
