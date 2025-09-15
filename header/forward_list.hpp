@@ -19,7 +19,7 @@ class forward_lists{
         Node* head;
     public:
         forward_lists(){
-            this->head = new Node(0);
+            this->head = new Node(T{});
             this->head->next = nullptr;
             this->size = 1;
         }
@@ -28,13 +28,17 @@ class forward_lists{
          * @details
          */
         forward_lists(std::initializer_list<T> arr): head(nullptr){
-            Node** curr = &head; //store alamat memory head ke curr
+            head = new Node(T{});
+            head->next = nullptr;
+            size = 0;
+            Node** curr = &head->next; //store alamat memory head ke curr
             for(const T& it: arr){
                 *curr = new Node(it); //deference pointer
                 //head = new Node(it) ->meaning
                 curr = &((*curr)->next); //store alamat curr->next
                //curr = head->next
                //curr selalu menunjuk ke posisi kosong
+               size++;
             }   
         }
         //copy constructor
@@ -90,7 +94,7 @@ class forward_lists{
                     os << "no output";
                 }
                 return os;
-            }
+                }
                 T& operator*(){
                     return node->data;
                 }
@@ -134,43 +138,37 @@ class forward_lists{
         }
     public: //getter
         T front(){
-            return head->data;
+            return head->next->data;
         }
         int get_size(){
             return this->size;
         }
     public:
-        void push_front(const T& data){
+        void push_front(const T&& data){
+            Node* pos = head;
             Node* new_node = new Node(data);
-            new_node->next = head;
-            head = new_node;
+            new_node->next = pos->next;
+            pos->next = new_node;
             size++;
         }
-        void pop_front(){
+        void pop_front(){   
+            Node* pos = before_begin().get_raw();
             Node* temp = head;
-            head = head->next;
+            pos = pos->next;
             size--;
             delete temp;
         }
         /**
          * @brief insert after
          */
-        void insert_after(Iterator iter_position,T val){
+        void insert_after(Iterator iter_position,T&& val){
             Node* curr = iter_position.get_raw();
-            ++curr; //pre increment
-            if(curr == nullptr){
-                return;
-            }
-            Node* new_node = new_node(val);
+            Node* new_node = new Node(val);
             new_node->next = curr->next;
             curr->next  = new_node;
         }   
-        void insert_after(Iterator Iterator_position,int n,T val){
+        void insert_after(Iterator Iterator_position,int n,T&& val){
             Node* curr = Iterator_position.get_raw();
-            ++curr;
-            if(curr == nullptr){
-                return;
-            }
             if(n < 1){
                 return;
             }
@@ -210,7 +208,7 @@ class forward_lists{
             tail->next = curr->next;
             curr->next = new_node;
         }
-        void insert_after(Iterator iter_position,Iterator listBegin,Iterator listEnd){
+        void insert_after(const Iterator iter_position,const Iterator listBegin,const Iterator listEnd){
             Node* curr = iter_position.get_raw();
             Node* new_node = new Node(*listBegin);
             Node* tail = new_node;
@@ -225,7 +223,7 @@ class forward_lists{
             curr->next = new_node;
         }
     public://overload erase after
-        void erase_after(Iterator iter_position){
+        void erase_after(const Iterator iter_position){
             Node* curr = iter_position.get_raw();
             Node* temp = curr;
             ++curr; //curr = curr->next,gerakkan curr
@@ -234,7 +232,7 @@ class forward_lists{
             delete dlt;
             temp->next = curr;
         }
-        void erase_after(Iterator pos_begin,Iterator pos_end){
+        void erase_after(const Iterator pos_begin,const Iterator pos_end){
             Node* curr = pos_begin.get_raw();
             curr = curr->next;
             while(curr != pos_end){
@@ -252,7 +250,7 @@ class forward_lists{
             std::cout << std::endl;
         }
         void clear(){
-            while(head != nullptr){
+            while(before_begin() != end()){
                 Node* temp = head;
                 head = head->next;
                 delete temp;
