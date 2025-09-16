@@ -2,9 +2,17 @@
 #include <vector>
 #include "../header/forward_list.hpp"
 int main(){
+    std::cout << "Pop Front" << std::endl;
+    forward_lists<int>flst = {1,2,3};
+    flst.pop_front();
+    flst.pop_front();
+    flst.print_all(flst.begin(),flst.end()); //3
     //initializer list
     std::cout << "initializer list constructor" << std::endl;
     forward_lists<int>lst = {1,2,3};
+    lst.print_all(lst.begin(),lst.end());
+    lst.erase_after(lst.begin());
+    std::cout << "ini erase after 1" << std::endl;
     lst.print_all(lst.begin(),lst.end());
     std::cout << "ini front: " << lst.front() << std::endl; 
     forward_lists<int>cp = lst;
@@ -53,10 +61,11 @@ int main(){
     fl3.insert_after(fl3.begin(),fwl.begin(),fwl.end());
     fl3.print_all(fl3.begin(), fl3.end()); //8 50 60 40 9 10
     //proses copy constructor
-    //===============Proses Erasing===================================
-    std::cout << "Pop Front" << std::endl;
-    forward_lists<int>flst = {1,2,3};
-    flst.print_all(flst.begin(),flst.end()); //2 3
+    //===============Proses erase_after===================================
+    std::cout << "erase after 2" << std::endl;
+    forward_lists<int>abs = {1,2,3,5,6,6};
+    abs.erase_after(abs.begin(),abs.end());
+    abs.print_all(abs.begin(),abs.end());
     //std::cin.get();
     return 0;
 }   
