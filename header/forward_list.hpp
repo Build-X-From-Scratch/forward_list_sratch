@@ -2,6 +2,8 @@
 #include <initializer_list>
 #include <type_traits>
 #include <iterator>
+#include <cstddef>
+#include <limits>
 #ifndef __forwardList
 #define __forwardList
 template <typename T>
@@ -58,7 +60,7 @@ class forward_lists{
             }
         }
         //copy assignment
-        forward_lists& operator==(const forward_lists& others){
+        forward_lists& operator=(const forward_lists& others){
             if(this == &others){
                 return *this;
             }
@@ -77,6 +79,29 @@ class forward_lists{
             }
             return *this;
         }
+        /**
+         * @brief move constructor
+         * dipakai ketika ingin memindahkan node pada list a ke list b 
+         * @details others.head dipakai untuk menghindari double delete
+         * ketika others keluar dari scope function maka destructor dipanggil
+         * karena head = others.head maka head == nullptr,akan mengakibatkan
+         * undefined behavior
+         */
+        forward_lists(forward_lists&& others) noexcept : head(nullptr){
+            head = others.head;
+            others.head == nullptr; //kosongkan others lama agar tidak memory leak
+        }
+        /**
+         * @brief move assignment constructor
+         */
+        forward_lists& operator=(forward_lists&& others)noexcept{
+            if(this != others){
+                clear();
+                head = others.head;
+                others.head = nullptr;
+            }
+            return *this;
+        }   
         ~forward_lists(){
             clear();
         }
@@ -150,6 +175,23 @@ class forward_lists{
             }
             return false;
         }
+        /**
+         * @brief mengembalikan jumlah maksimum yang dapat di tampung list
+         * 
+         * @details
+         * konsep adalah maksimum byte element yang dapat ditampung type data
+         * dibagi oleh jumlah memory untuk 1 node
+         * satu node terdiri dari:
+         * - data (misal int ) ->4 byte
+         * - pointer ke node berikut nya(Node) -> 8 byte pada arsitektur 64 byte
+         * jadi perhitungannya:
+         * @code
+         * std::numeric_limits<size_t>::max() / sizeof(Node)
+         * @endcode
+         */
+        std::size_t max_size()const noexcept{
+            return std::numeric_limits<T>::max() / sizeof(Node);
+        }   
     public:
         void push_front(const T&& data){
             Node* pos = head; 
@@ -171,7 +213,7 @@ class forward_lists{
             if(!first){
                 return;
             }
-            Node* temp = first; //deferencing
+            Node* temp = first;
             first = first->next;
             pos->next = first;
             size--;
@@ -272,21 +314,24 @@ class forward_lists{
     public://overload erase after
         void erase_after(const Iterator iter_position){
             Node* curr = iter_position.get_raw();
-            Node* temp = curr;
-            ++curr; //curr = curr->next,gerakkan curr
-            Node* dlt = curr;
-            ++curr;//curr = curr->next,gerakkan curr
-            delete dlt;
-            temp->next = curr;
+            if(!curr->next){
+                return;
+            }
+            Node* temp = curr->next;
+            curr->next = temp->next;
+            delete temp;
         }
         void erase_after(const Iterator pos_begin,const Iterator pos_end){
-            Node* curr = pos_begin.get_raw();
-            curr = curr->next;
-            while(curr != pos_end){
+            Node* first = pos_begin.get_raw();
+            Node* curr = first->next;
+            Node* last = pos_end.get_raw();
+         //   curr = curr->next;
+            while(curr != last){
                 Node* temp = curr;
                 curr = curr->next;
                 delete temp;
             }
+            first->next = last;
         }
     public:
         void print_all(Iterator begin,Iterator end){
@@ -297,9 +342,9 @@ class forward_lists{
             std::cout << std::endl;
         }
         void clear(){
-            while(before_begin() != end()){
-                Node* temp = head;
-                head = head->next;
+            while(head->next != nullptr){
+                Node* temp = head->next;
+                head->next = head->next->next;
                 delete temp;
             }
         }
