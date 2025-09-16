@@ -7,6 +7,13 @@ int main(){
     forward_lists<int>lst = {1,2,3};
     lst.print_all(lst.begin(),lst.end());
     std::cout << "ini front: " << lst.front() << std::endl; 
+    forward_lists<int>cp = lst;
+    std::cout << "ini copy " << std::endl;
+    cp.print_all(cp.begin(),cp.end());
+    std::cout << "ini copy assignment" << std::endl;
+    forward_lists<int>ca;
+    ca = cp;
+    ca.print_all(ca.begin(),ca.end());
     //memanggil default constructor    
     std::cout << "list FL" << std::endl;
     forward_lists<int>fl;   
@@ -45,6 +52,7 @@ int main(){
     forward_lists<int>fwl = {50,60,40};
     fl3.insert_after(fl3.begin(),fwl.begin(),fwl.end());
     fl3.print_all(fl3.begin(), fl3.end()); //8 50 60 40 9 10
+    //proses copy constructor
     //===============Proses Erasing===================================
     std::cout << "Pop Front" << std::endl;
     forward_lists<int>flst = {1,2,3};

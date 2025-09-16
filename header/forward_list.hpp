@@ -43,18 +43,19 @@ class forward_lists{
         }
         //copy constructor
         forward_lists(const forward_lists& others){
-            if(*this == &others){
-                return *this;
+            if(others.head->next == nullptr){
+                head = nullptr;
+                return;
             }
-            head = new Node(others.head->data); //inialisasi data pertama
-            Node* curr = head; //pointer penggerak
-            Node* temp = others.head->next;
+            head = new Node(others.head->data);
+            head->next = new Node(others.head->next->data); //inialisasi data pertama
+            Node* curr = head->next; //pointer penggerak
+            Node* temp = others.head->next->next;
             while(temp != nullptr){
                 curr->next = new Node(temp->data);
                 curr = curr->next;
                 temp = temp->next;
             }
-            return *this;
         }
         //copy assignment
         forward_lists& operator==(const forward_lists& others){
@@ -62,13 +63,13 @@ class forward_lists{
                 return *this;
             }
             clear();
-            if(!others.head){ //nullptr
+            if(!others.head->next){ //nullptr
                 head = nullptr;
                 return *this;
             }
-            head = new Node(others.head->data);
-            Node* curr = head;
-            Node* temp = others.head->next;
+            head->next = new Node(others.head->next->data); //inialisasi data pertama
+            Node* curr = head->next; //pointer penggerak
+            Node* temp = others.head->next->next;
             while(temp != nullptr){
                 curr->next = new Node(temp->data);
                 curr = curr->next;
