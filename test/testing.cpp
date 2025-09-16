@@ -36,3 +36,12 @@ TEST(Constructor_testing,basic_constructor_test){
     EXPECT_FALSE(fl.is_empty());
     EXPECT_EQ(fl.get_size(), 1);
 }
+TEST(Insert_testing,push_testing){
+    forward_lists<int>fl;
+    fl.push_front(1);
+    fl.push_front(2);
+    fl.push_front(3);
+    int x = 4;
+    fl.push_front(x);
+    std::vector<int>ex = {4,3,2,1};
+}
