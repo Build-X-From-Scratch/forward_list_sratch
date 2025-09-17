@@ -26,10 +26,31 @@ class forward_lists{
             this->size = 0;
         }
         /**
+         * @brief constructor range,adalah constructor yang menginialisasi nilai dari 
+         * sebuah container dengan element dari suatu rentang  yang di tentukan oleh
+         * 2 iterator awal(first) dan akhir(last) 
+         * @details time complexity o(n), dan space complexity O(n)
+         * 
+         */
+        template<typename inputIterator>
+        requires std::input_iterator<inputIterator>
+        forward_lists(inputIterator begin,inputIterator end): head(nullptr),size(0){
+            head = new Node(T{});
+            head->next = nullptr;
+            size = 0;
+            Node** curr = &head->next; //curr menunjuk head->next
+            while(begin != end){
+                *curr = new Node(*begin); //isi node
+                curr = &((*curr)->next); //curr = curr->next
+                size++; //increment size
+                ++begin; //increment iterator
+            }
+        }
+        /**
          * @brief initializer list constructor
          * @details
          */
-        forward_lists(std::initializer_list<T> arr): head(nullptr){
+        forward_lists(std::initializer_list<T> arr): head(nullptr),size(0){
             head = new Node(T{});
             head->next = nullptr;
             size = 0;
@@ -163,12 +184,24 @@ class forward_lists{
             return Iterator(head);
         }
     public: //getter
+        /**
+         * @brief method getter yang mengembalikan nilai node pada pos front
+         * @details time complexity O(1)
+         */
         T front(){
             return head->next->data;
         }
+        /**
+         * @brief method getter yang mengembalilkan jumlah element saat ini
+         * @details time complexity O(1)
+         */
         int get_size(){
             return this->size;
         }
+        /**
+         * @brief method getter yang mengembalilkan true jika list empty,sebalik false jika tidak kosong
+         * @details time complexity O(1)
+         */
         bool is_empty(){
             if(size == 0){
                 return true;
@@ -188,6 +221,7 @@ class forward_lists{
          * @code
          * std::numeric_limits<size_t>::max() / sizeof(Node)
          * @endcode
+         * Time complexity O(1),Space Complexity O(1)
          */
         std::size_t max_size()const noexcept{
             return std::numeric_limits<T>::max() / sizeof(Node);
@@ -220,7 +254,51 @@ class forward_lists{
             delete temp;
         }
         /**
-         * @brief insert after
+         * @brief Menyisipkan elemen setelah posisi iterator tertentu.
+         *
+         * Method ini memiliki beberapa bentuk (overload) untuk menyesuaikan kebutuhan:
+         *
+         * 1. `insert_after(iterator pos, const T& value)`  
+         *    Menyisipkan satu elemen setelah posisi `pos`.
+         *
+         * 2. `insert_after(iterator pos, size_type n, const T& value)`  
+         *    Menyisipkan `n` elemen dengan nilai `value` setelah posisi `pos`.
+         *
+         * 3. `insert_after(iterator pos, InputIterator first, InputIterator last)`  
+         *    Menyisipkan elemen dari rentang `[first, last)` setelah posisi `pos`.
+         *
+         * 4. `insert_after(iterator pos, std::initializer_list<T> ilist)`  
+         *    Menyisipkan seluruh elemen dari `ilist` setelah posisi `pos`.
+         */
+       /**
+         * @brief Overload insert_after(iterator pos, const T& value)
+         *
+         * Method ini biasanya membutuhkan 2 overload function agar dapat bekerja optimal:
+         *
+         * 1. Overload dengan parameter **const reference** (`const T&`):  
+         *    - Digunakan ketika argumen yang diberikan adalah **lvalue**.  
+         *    - Objek tidak dipindahkan, tetapi disalin (copy).  
+         *    - Efisien karena tidak membuat salinan tambahan saat menerima lvalue.  
+         *    - Keterbatasan: tidak bisa langsung menerima rvalue.
+         *
+         * 2. Overload dengan parameter **rvalue reference** (`T&&`) / **forwarding reference**:  
+         *    - Digunakan ketika argumen adalah **rvalue** atau ketika kita ingin memanfaatkan
+         *      move semantics.  
+         *    - Bisa juga menerima lvalue, karena forwarding reference tunduk pada
+         *      *reference collapsing rules*.  
+         *    - Harus dipanggil dengan `std::forward<T>(val)` agar semantik lvalue/rvalue
+         *      tetap terjaga.
+         *
+         * @details Catatan penting mengenai forwarding reference:
+         * - Jika argumen adalah **lvalue**, maka `T` akan terdeduksi sebagai `T&`, dan parameter
+         *   `T&&` akan menjadi `T& &&` → dikecilkan (collapse) menjadi `T&`.
+         * - Jika argumen adalah **rvalue**, maka `T` akan terdeduksi sebagai `T`, dan parameter
+         *   `T&&` benar-benar menjadi rvalue reference.
+         *
+         * Dengan dua overload ini:
+         * - `insert_after(pos, x)` → memanggil versi `const T&` (copy dari lvalue).  
+         * - `insert_after(pos, std::move(x))` atau `insert_after(pos, T("..."))`
+         *   → memanggil versi `T&&` (move dari rvalue).
          */
         void insert_after(Iterator iter_position,T&& val){
             Node* curr = iter_position.get_raw();
