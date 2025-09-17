@@ -1,0 +1,13 @@
+create database db_genap1
+create table karyawan
+id  int
+nama  varchar
+bagian varchar 
+gaji double
+
+masukkan banyak data
+nama table: bagian
+buat kolom
+Kode_bagian int  
+Nama_bagian varchar 50
+Nama_manajer varchar 50 

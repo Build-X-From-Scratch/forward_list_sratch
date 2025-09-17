@@ -3,8 +3,7 @@
 #include "../header/forward_list.hpp"
 int main(){
     std::cout << "Pop Front" << std::endl;
-    forward_lists<int>flst = {1,2,3};
-    flst.pop_front();
+    forward_lists<int>flst = {1,2,3,4,5};
     flst.pop_front();
     flst.print_all(flst.begin(),flst.end()); //3
     //initializer list

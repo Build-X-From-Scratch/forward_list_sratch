@@ -7,7 +7,6 @@ TEST(Basic_stl,check_empty){
     EXPECT_EQ(fl.get_size(), 0);
     EXPECT_TRUE(fl.is_empty());
 }
-
 TEST(Basic_stl,check_front){
     forward_lists<int>fl = {1};
     EXPECT_EQ(fl.front(), 1);
@@ -15,17 +14,18 @@ TEST(Basic_stl,check_front){
 }
 TEST(Basic_stl,pop_element){
     forward_lists<int>fl = {1,2,3,4,5};
+    EXPECT_EQ(fl.get_size(),5);
+    EXPECT_EQ(fl.front(), 1);
     fl.pop_front();
     std::vector<int>actual;
     std::vector<int>expectation = {2,3,4,5};
     for(auto x: fl){
         actual.push_back(x);
     }
-    EXPECT_TRUE(!fl.is_empty());
-    EXPECT_EQ(fl.get_size(),3);
+    EXPECT_FALSE(fl.is_empty());
+    EXPECT_EQ(fl.get_size(),4);
     EXPECT_EQ(actual, expectation);
 }
-
 TEST(Constructor_testing,initializer_constructor_test){
     forward_lists<int>fl = {1,2,3};
     std::vector<int>ex = {1,2,3};
@@ -67,7 +67,7 @@ TEST(Insert_testing, push_lvalue_testing){
     forward_lists<int>fl;
     int x,y,z;
     x = 10;
-    y = 20;
+    y = 20; 
     z = 30;
     fl.push_front(x);
     fl.push_front(y);
