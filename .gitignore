@@ -6,6 +6,8 @@ Release/
 Debug/
 # bin
 bin
+# node modulers
+node_modules
 # build
 build
 # Binary output (keep bin structure but ignore contents during development)
