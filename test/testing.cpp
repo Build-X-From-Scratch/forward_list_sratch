@@ -37,6 +37,23 @@ TEST(Constructor_testing,initializer_constructor_test){
     EXPECT_FALSE(fl.is_empty());
     EXPECT_EQ(fl.get_size(), 3);
 }
+TEST(Constructor_testing, range_constructor){
+    std::vector<int>cp = {1,2,3};
+    forward_lists<int>fl(cp.begin(),cp.end());
+    std::vector<int>expec;
+    std::vector<int>actual = {1,2,3};
+    for(auto x: fl){
+        expec.push_back(x);
+    }
+    EXPECT_EQ(actual, expec);
+    forward_lists<int>range = {1,2,3,};
+    forward_lists<int>mv(range.begin(),range.end());
+    std::vector<int>expectations;
+    for(auto x: mv){
+        expectations.push_back(x);
+    }
+    EXPECT_EQ(actual,expectations);
+}
 TEST(Constructor_testing,basic_constructor_test){
     forward_lists<int>fl;
     fl.push_front(1);

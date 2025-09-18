@@ -4,8 +4,15 @@
 #include <iterator>
 #include <cstddef>
 #include <limits>
+#include <concepts>
 #ifndef __forwardList
 #define __forwardList
+template <typename It>
+concept my_input_iterator = requires(It it){
+    *it; //bisa di deferencing
+    ++it; //bisa post increment
+    it++; //bisa pre increment
+};
 template <typename T>
 class forward_lists{
     private:
@@ -32,12 +39,12 @@ class forward_lists{
          * @details time complexity o(n), dan space complexity O(n)
          * 
          */
-        template<typename inputIterator>
-        requires std::input_iterator<inputIterator>
-        forward_lists(inputIterator begin,inputIterator end): head(nullptr),size(0){
+        template <typename It>  
+        requires my_input_iterator<It>
+        forward_lists(It begin,It end): head(nullptr),size(0){
             head = new Node(T{});
-            head->next = nullptr;
             size = 0;
+            head->next = nullptr;
             Node** curr = &head->next; //curr menunjuk head->next
             while(begin != end){
                 *curr = new Node(*begin); //isi node
@@ -50,7 +57,7 @@ class forward_lists{
          * @brief initializer list constructor
          * @details
          */
-        forward_lists(std::initializer_list<T> arr): head(nullptr),size(0){
+        forward_lists(std::initializer_list<T> arr): head(nullptr){
             head = new Node(T{});
             head->next = nullptr;
             size = 0;
@@ -110,7 +117,7 @@ class forward_lists{
          */
         forward_lists(forward_lists&& others) noexcept : head(nullptr){
             head = others.head;
-            others.head == nullptr; //kosongkan others lama agar tidak memory leak
+            others.head = nullptr; //kosongkan others lama agar tidak memory leak
         }
         /**
          * @brief move assignment constructor
