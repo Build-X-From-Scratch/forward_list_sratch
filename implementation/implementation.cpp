@@ -67,5 +67,13 @@ int main(){
     abs.erase_after(abs.begin(),abs.end());
     abs.print_all(abs.begin(),abs.end());
     //std::cin.get();
+    //================segfaul===========================
+    std::cout << "Disini segfault" << std::endl;
+    forward_lists<int>list = {10,20,30,40,50,60,70,80,90,100};
+   list.print_all(list.begin(),list.end());  
+    std::cout << list.get_size() << std::endl;
+    list.erase_after(list.begin());
+    list.print_all(list.begin(),list.end());    
+    std::cout << list.get_size() << std::endl;
     return 0;
 }   

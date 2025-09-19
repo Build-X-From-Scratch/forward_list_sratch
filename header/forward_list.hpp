@@ -361,15 +361,12 @@ class forward_lists{
                 curr->next = new_node;
             }
         }
-        template<typename pos>
-        void insert_after(Iterator iter_position,pos itr1,pos itr2){
-            using category = typename std::iterator_traits<pos>::iterator_category;
-            static_assert(
-                std::is_base_of_v<std::input_iterator_tag,category>,
-                "parameter harus iterator"
-            );
+        template<std::input_iterator It>
+        requires (!std::same_as<It,Iterator>)
+        void insert_after(Iterator iter_position,It itr1,It itr2){
             Node* curr = iter_position.get_raw();
             Node* new_node = new Node(*itr1);
+            size++;
             Node* tail = new_node;
             ++itr1;
             while(itr1 != itr2){
@@ -377,6 +374,7 @@ class forward_lists{
                 ++itr1;
                 tail->next = n_node;
                 tail = n_node;
+                size++;
             }
             tail->next = curr->next;
             curr->next = new_node;
@@ -384,14 +382,17 @@ class forward_lists{
         void insert_after(const Iterator iter_position,Iterator listBegin,const Iterator listEnd){
             Node* curr = iter_position.get_raw();
             Node* new_head = listBegin.get_raw();
+            Node* end = listEnd.get_raw();
             Node* new_node = new Node(new_head->data);
+            size++;
             Node* tail = new_node;
             new_head = new_head->next;   
-            while(listBegin != listEnd){
+            while(new_head != end){
                 Node* n_node = new Node(new_head->data);
                 tail->next = n_node;
                 tail = n_node;
                 new_head = new_head->next; 
+                size++;
             }
             tail->next = curr->next;
             curr->next = new_node;
@@ -404,6 +405,7 @@ class forward_lists{
             }
             Node* temp = curr->next;
             curr->next = temp->next;
+            size--;
             delete temp;
         }
         void erase_after(const Iterator pos_begin,const Iterator pos_end){
@@ -415,6 +417,7 @@ class forward_lists{
                 Node* temp = curr;
                 curr = curr->next;
                 delete temp;
+                size--;
             }
             first->next = last;
         }
