@@ -66,6 +66,40 @@ TEST(Constructor_testing,basic_constructor_test){
     EXPECT_FALSE(fl.is_empty());
     EXPECT_EQ(fl.get_size(), 1);
 }
+TEST(Constructor_testing,mv_constructor){
+    forward_lists<int>fl = {1,2,3,4};
+    forward_lists<int>flst = std::move(fl);
+    int size_fl = fl.get_size();
+    int size_flst = flst.get_size();
+    EXPECT_EQ(size_fl,size_flst);
+    std::vector<int>exFl;
+    std::vector<int>exFlst;
+    for(auto x: fl){
+        exFl.push_back(x);
+    }
+    for(auto x: flst){
+        exFlst.push_back(x);
+    }
+    EXPECT_EQ(exFl,exFlst);
+}
+TEST(Constructor_testing,mv_assgn_test){
+    forward_lists<int>list;
+    list = {1,2,3};
+    forward_lists<int>cp;
+    cp = std::move(list);
+    std::vector<int>Slist;
+    std::vector<int>Scp;
+    for(auto x: list){
+        Slist.push_back(x);
+    }
+    for(auto x: cp){
+        Scp.push_back(x);
+    }
+    int SizeList = list.get_size();
+    int SizeCp = cp.get_size();
+    EXPECT_EQ(SizeList,SizeCp);
+    EXPECT_EQ(Slist,Scp);
+}
 TEST(Insert_testing,push_testing){
     forward_lists<int>fl;
     fl.push_front(1);
