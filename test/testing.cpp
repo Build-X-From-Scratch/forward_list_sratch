@@ -98,3 +98,47 @@ TEST(Insert_testing, push_lvalue_testing){
     EXPECT_FALSE(fl.is_empty());
     EXPECT_EQ(fl.get_size(), 3);
 }
+TEST(Insert_testing,insert_afterII){
+    forward_lists<int>fl = {1,2,3};
+    std::vector<int>v = {10,20,30};
+    fl.insert_after(fl.begin(),v.begin(),v.end());
+    std::vector<int>expectations = {1,10,20,30,2,3};
+    std::vector<int>actual;
+    for(auto x: fl){
+        actual.push_back(x);
+    }
+    EXPECT_EQ(actual,expectations);
+    EXPECT_EQ(fl.get_size(),6);
+    EXPECT_FALSE(fl.is_empty());
+}
+TEST(Insert_testing,insert_afterIII){
+    forward_lists<int>fl = {1,2,3,4,5};
+    EXPECT_EQ(fl.get_size(),5);
+    forward_lists<int>flst;
+    EXPECT_TRUE(flst.is_empty());
+    flst.push_front(10);
+    flst.push_front(20);
+    flst.push_front(30);
+    EXPECT_EQ(flst.get_size(),3);
+    //flst  = {30 20 10}
+    fl.insert_after(fl.begin(),flst.begin(),flst.end());
+    std::vector<int>expectations = {1,30,20,10,2,3,4,5};
+    std::vector<int>actual;
+    for(auto x: fl){
+        actual.push_back(x);
+    }
+    EXPECT_EQ(actual,expectations);
+    EXPECT_EQ(fl.get_size(),8);
+}
+TEST(erase_testing,erase_afterI){
+    forward_lists<int>fl = {10,20,30,40,50,60,70,80,90,100};
+    EXPECT_EQ(fl.get_size(),10);
+    fl.erase_after(fl.begin());
+    std::vector<int>expectations = {10,30,40,50,60,70,80,90,100};
+    std::vector<int>actual;
+    for(auto x: fl){
+        actual.push_back(x);
+    }
+    EXPECT_EQ(fl.get_size(),9);
+    EXPECT_EQ(actual,expectations);
+}
