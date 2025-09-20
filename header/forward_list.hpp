@@ -47,7 +47,7 @@ class forward_lists{
             head->next = nullptr;
             Node** curr = &head->next; //curr menunjuk head->next
             while(begin != end){
-                *curr = new Node(*begin); //isi node
+                    *curr = new Node(*begin); //isi node
                 curr = &((*curr)->next); //curr = curr->next
                 size++; //increment size
                 ++begin; //increment iterator
@@ -117,7 +117,9 @@ class forward_lists{
          */
         forward_lists(forward_lists&& others) noexcept : head(nullptr){
             head = others.head;
+            size = others.size;
             others.head = nullptr; //kosongkan others lama agar tidak memory leak
+            others.size = 0;
         }
         /**
          * @brief move assignment constructor
@@ -126,7 +128,9 @@ class forward_lists{
             if(this != others){
                 clear();
                 head = others.head;
+                size = others.size;
                 others.head = nullptr;
+                others.size = 0;
             }
             return *this;
         }   
@@ -172,22 +176,31 @@ class forward_lists{
                 }
         };
     public: //inialisasi Iterator
+        /**
+         * @brief iterator yang menunjuk dummy node yaitu head
+         */
         Iterator before_begin(){
             return Iterator(head);
         }
+        /**
+         * @brief iterator yang menunjuk node pada element pertama pada list
+         */
         Iterator begin(){
             return Iterator(head->next);
         }
+        /**
+         * @brief iterator yang menunjuk pointer setelah node terakhir(tail)
+         */
         Iterator end(){
             return Iterator(nullptr);
         }
-        Iterator cbegin()const{
+        Iterator cbegin()const{//constant iterator
             return Iterator(head->next);
         }
-        Iterator cend()const{
+        Iterator cend()const{ //constant iterator
             return Iterator(nullptr);
         }
-        Iterator cbefore_begin()const{
+        Iterator cbefore_begin()const{ //constant iterator
             return Iterator(head);
         }
     public: //getter
@@ -234,6 +247,11 @@ class forward_lists{
             return std::numeric_limits<T>::max() / sizeof(Node);
         }   
     public:
+        /**
+         * @brief method untuk insertion val pada pos front
+         * 
+         * @details Time complexity O(1),Space Complexity O(1)
+         */
         void push_front(const T&& data){
             Node* pos = head; 
             Node* new_node = new Node(data);
@@ -248,6 +266,11 @@ class forward_lists{
             pos->next = new_node;
             size++;
         }
+        /**
+         * @brief method untuk deletion val pada pos front
+         * 
+         * @details Time complexity O(1),Space Complexity O(1)
+         */
         void pop_front(){   
             Node* pos = head;
             Node* first = head->next;
@@ -421,7 +444,24 @@ class forward_lists{
             }
             first->next = last;
         }
+    public: //reverse method
+        void reverse(){
+            Node* prev = nullptr;
+            Node* curr = head->next;    
+            while(curr != nullptr){
+                Node* next = curr->next;
+                curr->next = next;
+                prev = curr;
+                curr = next;
+            }
+            head->next = prev;
+        }
     public:
+        /**
+         * @brief method untuk print semua node list 
+         * 
+         * @details Time complexity O(n),Space Complexity O(n)
+         */
         void print_all(Iterator begin,Iterator end){
             while(begin != end){
                 std::cout << *begin << " ";
@@ -429,6 +469,11 @@ class forward_lists{
             }
             std::cout << std::endl;
         }
+        /**
+         * @brief method untuk menghapus semua node pada head
+         * berguna pada destructor
+         * @details time complexity O(n),Space Complexity O(n)
+         */
         void clear(){
             while(head->next != nullptr){
                 Node* temp = head->next;
