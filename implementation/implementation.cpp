@@ -75,5 +75,10 @@ int main(){
     list.erase_after(list.begin());
     list.print_all(list.begin(),list.end());    
     std::cout << list.get_size() << std::endl;
+    //==============-assign=======================
+    //list.assign(5,10);
+   // list.print_all(list.begin(),list.end());
+    list.assign({1,2,3,4,5});
+    list.print_all(list.begin(),list.end());
     return 0;
 }   

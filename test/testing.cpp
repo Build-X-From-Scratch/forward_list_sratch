@@ -176,3 +176,40 @@ TEST(erase_testing,erase_afterI){
     EXPECT_EQ(fl.get_size(),9);
     EXPECT_EQ(actual,expectations);
 }
+TEST(Assign_test,Assign_testI){
+    forward_lists<int>list = {1,2,3,4,5};
+    EXPECT_EQ(list.get_size(),5);
+    list.assign(10,100);
+    EXPECT_EQ(list.get_size(),10);
+    std::vector<int>expectations = {100,100,100,100,100,100,100,100,100,100};
+    std::vector<int>actual;
+    for(auto x: list){
+        actual.push_back(x);
+    }
+    EXPECT_EQ(actual,expectations);
+}
+TEST(Assign_test,Assign_testII){
+    forward_lists<int>list = {100,100,100,100,100,100,100,100,100,100};
+    EXPECT_EQ(list.get_size(),10);
+    list.assign({1,2,3,4,5,6});
+    EXPECT_EQ(list.get_size(),6);
+    std::vector<int>expectations = {1,2,3,4,5,6};
+    std::vector<int>actual;
+    for(auto x: list){
+        actual.push_back(x);
+    }
+    EXPECT_EQ(actual,expectations);
+}
+TEST(Assign_test,Assign_testIII){
+    forward_lists<int>list = {100,100,100,100,100,100,100,100,100,100};
+    EXPECT_EQ(list.get_size(),10);
+    std::vector<int>Cp = {45,6,7,1,35,62,1};
+    list.assign(Cp.begin(),Cp.end());
+    EXPECT_EQ(list.get_size(),7);
+    std::vector<int>expectations = {45,6,7,1,35,62,1};
+    std::vector<int>actual;
+    for(auto x: list){
+        actual.push_back(x);
+    }
+    EXPECT_EQ(actual,expectations);
+}
