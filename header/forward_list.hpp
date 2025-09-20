@@ -457,6 +457,49 @@ class forward_lists{
             head->next = prev;
         }
     public:
+        void assign(std::size_t n,const T& value){
+            clear();
+            Node* curr = head;
+            for(std::size_t i = 0;i < n;i++){
+                curr->next = new Node(value);
+                curr = curr->next;
+                size++;
+            }
+        }
+        void assign(std::size_t n,T&& value){
+            clear();
+            Node* curr = head;
+            for(std::size_t i = 0;i < n;i++){
+                curr->next = new Node(value);
+                curr = curr->next;
+                size++;
+            }
+        }
+        void assign(std::initializer_list<T> arr){
+            clear();
+            head = new Node(T{});
+            head->next = nullptr;
+            Node** curr = &head->next;
+            size++;
+            for(const T& value: arr){
+                *curr = new Node(value); //curr = new Node
+                curr = &((*curr)->next); //curr = curr->next
+                size++;
+            }   
+        }   
+        template<typename It>
+        requires my_input_iterator<It>
+        void assign(It itr1,It itr2){
+            clear();
+            Node* curr = head;
+            while(itr1 != itr2){
+                curr->next = new Node(*itr1);
+                curr = curr->next;
+                size++;
+                ++itr1;
+            }
+        }
+    public:
         /**
          * @brief method untuk print semua node list 
          * 
@@ -480,6 +523,7 @@ class forward_lists{
                 head->next = head->next->next;
                 delete temp;
             }
+            size = 0;
         }
 };
 #endif
