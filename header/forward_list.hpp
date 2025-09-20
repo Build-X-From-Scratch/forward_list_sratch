@@ -457,6 +457,16 @@ class forward_lists{
             head->next = prev;
         }
     public:
+        /**
+         * @brief Method Assign
+         * Assign dipakai untuk mereplace list saat ini dengan list baru
+         * overload method assign
+         * assign(n,value) ->insert value sebanyak n kali
+         * assign(initializer_list<T>)->replace value pada initializer list ke list saat ini
+         * assign(iterator begin,iterator end) ->replace mulai dari iterator begin sampai sebelum iterator end
+         * 
+         * @details Time complexity O(n),Space Complexity O(n)
+         */
         void assign(std::size_t n,const T& value){
             clear();
             Node* curr = head;
@@ -498,6 +508,50 @@ class forward_lists{
                 size++;
                 ++itr1;
             }
+        }
+    public:  //slice after
+        /**
+         * @brief slice after
+         * method untuk memindahkan node dari satu list ke list lain
+         * tanpa menyalin data,tetapi move node pointer
+         * 
+         * @details Time complexity O(1),Space Complexity O(1)
+         */
+        void splice_after(const Iterator pos,forward_lists& others,const Iterator It){
+            Node* src = It.get_raw();
+            Node* moved = src->next;
+            src->next = moved->next; //src->next = src->next->next
+            
+            Node* dest = pos.get_raw();
+            moved->next = dest->next; //hubungkan ke list tujuan
+            dest->next = moved;
+            others.size--;
+            size++;
+        }
+        void splice_after(const Iterator pos,forward_lists&& others,const Iterator It){
+            Node* src = It.get_raw();
+            Node* moved = src->next;
+            src->next = moved->next; //src->next = src->next->next
+            
+            Node* dest = pos.get_raw();
+            moved->next = dest->next; //hubungkan ke list tujuan
+            dest->next = moved;
+            others.size--;
+            size++;
+        }
+        void splice_after(const Iterator pos,forward_lists& others){
+            Node* src = pos.get_raw();//pos object saat ini
+            Node* begin = others.begin(); //begin object lain
+            Node* end = others.end();
+            //hubungkan node terakhir ke object saat ini
+            Node* moved = src->next; //object saat ini
+            end->next = moved; //end->next = src->next
+           //hubungkan ke list tujuan
+            Node* curr = src; //curr menunjuk src
+            curr->next = begin;//curr next adalah begin dari object lain
+            //moved->next = begin; //object saat ini
+            size = others.size;
+            others.size = 0;
         }
     public:
         /**
