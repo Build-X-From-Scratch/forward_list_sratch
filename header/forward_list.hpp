@@ -26,10 +26,12 @@ class forward_lists{
         };
         int size;
         Node* head;
+        Node* tail;
     public:
         forward_lists(){
             this->head = new Node(T{});
             this->head->next = nullptr;
+            this->tail = this->head;    
             this->size = 0;
         }
         /**
@@ -45,9 +47,10 @@ class forward_lists{
             head = new Node(T{});
             size = 0;
             head->next = nullptr;
-            Node** curr = &head->next; //curr menunjuk head->next
+            tail = head;
+            Node** curr = &tail->next; //curr menunjuk head->next
             while(begin != end){
-                    *curr = new Node(*begin); //isi node
+                *curr = new Node(*begin); //isi node
                 curr = &((*curr)->next); //curr = curr->next
                 size++; //increment size
                 ++begin; //increment iterator
@@ -55,13 +58,14 @@ class forward_lists{
         }
         /**
          * @brief initializer list constructor
-         * @details
+         * @details time complexity O(n),Space Complexity O(n)
          */
         forward_lists(std::initializer_list<T> arr): head(nullptr){
             head = new Node(T{});
             head->next = nullptr;
+            tail = head;
             size = 0;
-            Node** curr = &head->next; //store alamat memory head ke curr
+            Node** curr = &tail->next; //store alamat memory head ke curr
             for(const T& it: arr){
                 *curr = new Node(it); //deference pointer
                 //head = new Node(it) ->meaning
@@ -252,19 +256,29 @@ class forward_lists{
          * 
          * @details Time complexity O(1),Space Complexity O(1)
          */
-        void push_front(const T&& data){
-            Node* pos = head; 
-            Node* new_node = new Node(data);
-            new_node->next = pos->next;
-            pos->next = new_node;
-            size++;
+        void push_front(T&& data){ //forwadding reference
+            if(tail == head){
+                Node* new_node = new Node(data);
+                head->next = tail = new_node;
+                size++;
+            }else{
+                Node* new_node  = new Node(data);
+                new_node->next = head->next;
+                head->next = new_node;
+                size++;
+            }
         }
         void push_front(const T& data){
-            Node* pos = before_begin().get_raw();
-            Node* new_node = new Node(data);
-            new_node->next = pos->next;
-            pos->next = new_node;
-            size++;
+            if(tail == head){
+                Node* new_node = new Node(data);
+                head->next = tail = new_node;
+                size++;
+            }else{
+                Node* new_node  = new Node(data);
+                new_node->next = head->next;
+                head->next = new_node;
+                size++;
+            }
         }
         /**
          * @brief method untuk deletion val pada pos front
@@ -272,16 +286,17 @@ class forward_lists{
          * @details Time complexity O(1),Space Complexity O(1)
          */
         void pop_front(){   
-            Node* pos = head;
-            Node* first = head->next;
-            if(!first){
+            if(tail == head){
                 return;
+            }else if(head->next == tail->next){
+                head = tail = nullptr;
+                size--;
+            }else{
+                Node* temp = head->next;
+                Node* next = head->next;
+                head->next = next->next;
+                delete temp;
             }
-            Node* temp = first;
-            first = first->next;
-            pos->next = first;
-            size--;
-            delete temp;
         }
         /**
          * @brief Menyisipkan elemen setelah posisi iterator tertentu.
@@ -335,12 +350,20 @@ class forward_lists{
             Node* new_node = new Node(val);
             new_node->next = curr->next;
             curr->next  = new_node;
+            if(curr == tail){ //jika posisi curr sama dengan tail
+                tail = new_node;
+            }
+            size++; //update size
         }
         void insert_after(Iterator iter_position,const T& val){
             Node* curr = iter_position.get_raw();
             Node* new_node = new Node(val);
             new_node->next = curr->next;
             curr->next  = new_node;
+            if(curr == tail){
+                tail = new_node; //update tail
+            }
+            size++; //increment size
         }      
         void insert_after(Iterator Iterator_position,int n,T&& val){
             Node* curr = Iterator_position.get_raw();
@@ -351,16 +374,22 @@ class forward_lists{
                 Node* new_node = new Node(val);
                 new_node->next = curr->next;
                 curr->next = new_node;
+                if(curr == tail){
+                    tail = new_node;
+                }
             }else{
                 Node* new_node = new Node(val);
-                Node* tail = new_node;
+                Node* n_tail = new_node;
                 for(int i = 0;i < n - 1;i++){
                     Node* baru = new Node(val);
-                    tail->next = baru;
-                    tail = baru;
+                    n_tail->next = baru;
+                    n_tail = baru;
                 }
-                tail->next = curr->next; 
+                n_tail->next = curr->next; 
                 curr->next = new_node;
+                if(curr == tail){
+                    tail = n_tail; //karena n_tail menunju node terakhir saat insertion
+                }
             }
         }
         void insert_after(Iterator Iterator_position,int n,const T& val){
@@ -372,16 +401,22 @@ class forward_lists{
                 Node* new_node = new Node(val);
                 new_node->next = curr->next;
                 curr->next = new_node;
+                if(curr == tail){
+                    tail = new_node;
+                }
             }else{
                 Node* new_node = new Node(val);
-                Node* tail = new_node;
+                Node* n_tail = new_node;
                 for(int i = 0;i < n - 1;i++){
                     Node* baru = new Node(val);
-                    tail->next = baru;
-                    tail = baru;
+                    n_tail->next = baru;
+                    n_tail = baru;
                 }
-                tail->next = curr->next; 
+                n_tail->next = curr->next; 
                 curr->next = new_node;
+                if(curr == tail){
+                    tail = n_tail;
+                }
             }
         }
         template<std::input_iterator It>
@@ -390,17 +425,20 @@ class forward_lists{
             Node* curr = iter_position.get_raw();
             Node* new_node = new Node(*itr1);
             size++;
-            Node* tail = new_node;
+            Node* n_tail = new_node;
             ++itr1;
             while(itr1 != itr2){
-                Node* n_node = new Node(*itr1);
-                ++itr1;
-                tail->next = n_node;
-                tail = n_node;
+                Node* n_node = new Node(*itr1); //deferencing itr1
+                ++itr1; //increment iterator itr1
+                n_tail->next = n_node;
+                n_tail = n_node;
                 size++;
             }
-            tail->next = curr->next;
+            n_tail->next = curr->next;
             curr->next = new_node;
+            if(curr == tail){
+                tail = n_tail;
+            }
         }
         void insert_after(const Iterator iter_position,Iterator listBegin,const Iterator listEnd){
             Node* curr = iter_position.get_raw();
@@ -408,42 +446,65 @@ class forward_lists{
             Node* end = listEnd.get_raw();
             Node* new_node = new Node(new_head->data);
             size++;
-            Node* tail = new_node;
+            Node* n_tail = new_node;
             new_head = new_head->next;   
             while(new_head != end){
                 Node* n_node = new Node(new_head->data);
-                tail->next = n_node;
-                tail = n_node;
+                n_tail->next = n_node;
+                n_tail = n_node;
                 new_head = new_head->next; 
                 size++;
             }
-            tail->next = curr->next;
+            n_tail->next = curr->next;
             curr->next = new_node;
+            if(curr == tail){
+                tail = new_node;
+            }
         }
     public://overload erase after
         void erase_after(const Iterator iter_position){
             Node* curr = iter_position.get_raw();
-            if(!curr->next){
-                return;
+            if(!curr->next){//tidak ada node setelah posisi iterator 
+                return; //return
             }
-            Node* temp = curr->next;
-            curr->next = temp->next;
-            size--;
-            delete temp;
+            if(curr->next == tail){ //jika node selanjutnya tail
+                Node* temp = curr->next;
+                tail = curr; // tail sekarang curr 
+                delete temp;
+                size--; 
+            }else{ //
+                Node* temp = curr->next;
+                curr->next = temp->next;
+                size--;
+                delete temp;
+            }
         }
         void erase_after(const Iterator pos_begin,const Iterator pos_end){
             Node* first = pos_begin.get_raw();
+            Node* fst = pos_begin.get_raw();
             Node* curr = first->next;
             Node* last = pos_end.get_raw();
          //   curr = curr->next;
             while(curr != last){
-                Node* temp = curr;
-                curr = curr->next;
-                delete temp;
-                size--;
+                if(curr == tail){
+                    Node* temp = curr;
+                    tail = fst;
+                    curr = curr->next;
+                    delete temp;
+                    size--;
+                }else{
+                    Node* temp = curr;
+                    curr = curr->next;
+                    delete temp;
+                    size--;
+                }
             }
             first->next = last;
+            if(last == nullptr){
+                tail = first;
+            }
         }
+
     public: //reverse method
         void reverse(){
             Node* prev = nullptr;
