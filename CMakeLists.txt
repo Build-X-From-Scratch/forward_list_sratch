@@ -31,6 +31,7 @@ enable_testing()
 add_executable(forward_list_test
   test/testing.cpp
 )
+# set_tests_properties(forward_list_test PROPERTIES TIMEOUT 5)
 target_link_libraries(forward_list_test
   PRIVATE forward_list_lib GTest::gtest_main
 )

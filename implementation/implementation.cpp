@@ -6,6 +6,8 @@ int main(){
     forward_lists<int>flst = {1,2,3};
     flst.pop_front();
     flst.pop_front();
+    std::cout << "harus nya sisa 3" << std::endl;
+    std::cout << "ini tail " << flst.back() << std::endl;
     flst.print_all(flst.begin(),flst.end()); //3
     //initializer list
     std::cout << "initializer list constructor" << std::endl;
