@@ -16,7 +16,7 @@ TEST(Basic_stl,pop_element){
     forward_lists<int>fl = {1,2,3,4,5};
     EXPECT_EQ(fl.get_size(),5);
     EXPECT_EQ(fl.front(), 1);
-    fl.pop_front();
+     fl.pop_front();
     std::vector<int>actual;
     std::vector<int>expectation = {2,3,4,5};
     for(auto x: fl){
@@ -68,15 +68,15 @@ TEST(Constructor_testing,basic_constructor_test){
 }
 TEST(Constructor_testing,mv_constructor){
     forward_lists<int>fl = {1,2,3,4};
-    forward_lists<int>flst = std::move(fl);
     int size_fl = fl.get_size();
-    int size_flst = flst.get_size();
-    EXPECT_EQ(size_fl,size_flst);
     std::vector<int>exFl;
-    std::vector<int>exFlst;
     for(auto x: fl){
         exFl.push_back(x);
     }
+    forward_lists<int>flst = std::move(fl);
+    int size_flst = flst.get_size();
+    EXPECT_EQ(size_fl,size_flst);
+    std::vector<int>exFlst;
     for(auto x: flst){
         exFlst.push_back(x);
     }
@@ -85,6 +85,7 @@ TEST(Constructor_testing,mv_constructor){
 TEST(Constructor_testing,mv_assgn_test){
     forward_lists<int>list;
     list = {1,2,3};
+    int Ssize = list.get_size();
     forward_lists<int>cp;
     cp = std::move(list);
     std::vector<int>Slist;
@@ -95,10 +96,9 @@ TEST(Constructor_testing,mv_assgn_test){
     for(auto x: cp){
         Scp.push_back(x);
     }
-    int SizeList = list.get_size();
-    int SizeCp = cp.get_size();
-    EXPECT_EQ(SizeList,SizeCp);
-    EXPECT_EQ(Slist,Scp);
+    EXPECT_EQ(list.get_size(),0);
+    EXPECT_EQ(cp.get_size(),3);
+    EXPECT_EQ(cp.get_size(),Ssize);
 }
 TEST(Insert_testing,push_testing){
     forward_lists<int>fl;
@@ -213,3 +213,17 @@ TEST(Assign_test,Assign_testIII){
     }
     EXPECT_EQ(actual,expectations);
 }
+// TEST(splice_test,splice_testI){
+//     forward_lists<int>fl = {1,2,3};
+//     forward_lists<int>list = {10,20,30};
+//     fl.splice_after(fl.begin(),list);
+//     std::vector<int>expectations = {1,10,20,30,2,3};
+//     std::vector<int>actual;
+//     for(auto x: fl){
+//         actual.push_back(x);
+//     }
+//     EXPECT_EQ(fl.get_size(),6);
+//     EXPECT_EQ(list.get_size(),0);
+//     EXPECT_TRUE(!list.is_empty());
+//     EXPECT_EQ(actual,expectations);
+// }

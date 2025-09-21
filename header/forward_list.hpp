@@ -43,14 +43,15 @@ class forward_lists{
          */
         template <typename It>  
         requires my_input_iterator<It>
-        forward_lists(It begin,It end): head(nullptr),size(0){
+        forward_lists(It begin,It end){
             head = new Node(T{});
             size = 0;
             head->next = nullptr;
             tail = head;
-            Node** curr = &tail->next; //curr menunjuk head->next
+            Node** curr = &head->next; //curr menunjuk head->next
             while(begin != end){
-                *curr = new Node(*begin); //isi node
+                *curr = new Node(*begin); //isi node dengan deferencing begin
+                tail = *curr;
                 curr = &((*curr)->next); //curr = curr->next
                 size++; //increment size
                 ++begin; //increment iterator
@@ -65,10 +66,11 @@ class forward_lists{
             head->next = nullptr;
             tail = head;
             size = 0;
-            Node** curr = &tail->next; //store alamat memory head ke curr
+            Node** curr = &head->next; //store alamat memory head ke curr
             for(const T& it: arr){
                 *curr = new Node(it); //deference pointer
                 //head = new Node(it) ->meaning
+                tail = *curr;
                 curr = &((*curr)->next); //store alamat curr->next
                //curr = head->next
                //curr selalu menunjuk ke posisi kosong
@@ -119,21 +121,29 @@ class forward_lists{
          * karena head = others.head maka head == nullptr,akan mengakibatkan
          * undefined behavior
          */
-        forward_lists(forward_lists&& others) noexcept : head(nullptr){
-            head = others.head;
+        forward_lists(forward_lists&& others) noexcept: head(new Node(T{})),tail(head),size(0){
+            head->next = others.head->next;
+            tail = others.tail == head ? head: others.tail; //ternery operator,if you dont understand please read documentation 
             size = others.size;
-            others.head = nullptr; //kosongkan others lama agar tidak memory leak
+
+            //kosongkan object lama
+            others.head->next = nullptr; 
+            others.tail = others.head;
             others.size = 0;
         }
         /**
          * @brief move assignment constructor
          */
         forward_lists& operator=(forward_lists&& others)noexcept{
-            if(this != others){
+            if(this != &others){
                 clear();
-                head = others.head;
+                head->next = others.head->next;
+                tail = others.tail == head ? head: others.tail; //ternery operator,if you dont understand please read documentation 
                 size = others.size;
-                others.head = nullptr;
+
+                //kosongkan object lama
+                others.head->next = nullptr; 
+                others.tail = others.head;
                 others.size = 0;
             }
             return *this;
@@ -250,6 +260,9 @@ class forward_lists{
         std::size_t max_size()const noexcept{
             return std::numeric_limits<T>::max() / sizeof(Node);
         }   
+        T back()const noexcept{
+            return this->tail->data;
+        }
     public:
         /**
          * @brief method untuk insertion val pada pos front
@@ -288,15 +301,14 @@ class forward_lists{
         void pop_front(){   
             if(tail == head){
                 return;
-            }else if(head->next == tail->next){
-                head = tail = nullptr;
-                size--;
-            }else{
-                Node* temp = head->next;
-                Node* next = head->next;
-                head->next = next->next;
-                delete temp;
             }
+            Node* temp = head->next;
+            head->next = temp->next;
+            if(temp == tail){
+                tail = head;
+            }
+            delete temp;
+            size--;
         }
         /**
          * @brief Menyisipkan elemen setelah posisi iterator tertentu.
@@ -551,7 +563,7 @@ class forward_lists{
             head = new Node(T{});
             head->next = nullptr;
             Node** curr = &head->next;
-            size++;
+            //size++;
             for(const T& value: arr){
                 *curr = new Node(value); //curr = new Node
                 curr = &((*curr)->next); //curr = curr->next
@@ -602,18 +614,25 @@ class forward_lists{
         }
         void splice_after(const Iterator pos,forward_lists& others){
             Node* src = pos.get_raw();//pos object saat ini
-            Node* begin = others.begin(); //begin object lain
-            Node* end = others.end();
-            //hubungkan node terakhir ke object saat ini
-            Node* moved = src->next; //object saat ini
-            end->next = moved; //end->next = src->next
-           //hubungkan ke list tujuan
-            Node* curr = src; //curr menunjuk src
-            curr->next = begin;//curr next adalah begin dari object lain
-            //moved->next = begin; //object saat ini
-            size = others.size;
+            Node* begin = others.head->next ; //begin object lain
+            Node* end = others.tail; //end object lain
+
+            //lingking node pertama others ke object saat ini
+            Node* moved = src->next; 
+            moved->next = begin->next; //tunjuk node setelah begin
+
+            begin->next = moved; //linking begin ke node setelah iterator
+            //linking node terakhir object lain ke src->next
+            end->next = src->next;
+
+            //linking node pertama object saat ini ke head object lain
+            src->next = begin;
+            size += others.size;
             others.size = 0;
         }
+        // void splice_after(const Iterator pos,forward_lists& others,const Iterator first,const Iterator last){
+        //     Node* curr = pos.get_raw();
+        // }
     public:
         /**
          * @brief method untuk print semua node list 
@@ -632,13 +651,16 @@ class forward_lists{
          * berguna pada destructor
          * @details time complexity O(n),Space Complexity O(n)
          */
-        void clear(){
-            while(head->next != nullptr){
-                Node* temp = head->next;
-                head->next = head->next->next;
-                delete temp;
-            }
-            size = 0;
+    void clear(){
+        Node* curr = head->next;   // mulai dari setelah dummy
+        while(curr != nullptr){
+            Node* temp = curr;
+            curr = curr->next;
+            delete temp;
         }
+        head->next = nullptr;  // dummy menunjuk ke kosong
+        tail = head;           // tail kembali ke dummy
+        size = 0;
+    }
 };
 #endif
