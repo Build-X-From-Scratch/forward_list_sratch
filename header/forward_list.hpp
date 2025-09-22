@@ -613,26 +613,67 @@ class forward_lists{
             size++;
         }
         void splice_after(const Iterator pos,forward_lists& others){
+            if(this == &others){
+                return;
+            }
             Node* src = pos.get_raw();//pos object saat ini
             Node* begin = others.head->next ; //begin object lain
             Node* end = others.tail; //end object lain
 
-            //lingking node pertama others ke object saat ini
-            Node* moved = src->next; 
-            moved->next = begin->next; //tunjuk node setelah begin
-
-            begin->next = moved; //linking begin ke node setelah iterator
-            //linking node terakhir object lain ke src->next
             end->next = src->next;
-
-            //linking node pertama object saat ini ke head object lain
             src->next = begin;
+            //update tail
+            if(src == tail){
+                tail = end;
+            }
+            //update size
             size += others.size;
+            //kosong object lain
+            others.head->next = nullptr; //harus menunjuk nullptr
+            others.tail = others.head;//reset tail,tail menunjuk head(dummy node)
             others.size = 0;
         }
-        // void splice_after(const Iterator pos,forward_lists& others,const Iterator first,const Iterator last){
-        //     Node* curr = pos.get_raw();
-        // }
+        void splice_after(const Iterator pos,forward_lists&& others){ //global reference
+            if(this == &others){
+                return;
+            }
+            Node* src = pos.get_raw();//pos object saat ini
+            Node* begin = others.head->next ; //begin object lain
+            Node* end = others.tail; //end object lain
+
+            end->next = src->next;
+            src->next = begin;
+            //update tail
+            if(src == tail){
+                tail = end;
+            }
+            //update size
+            size += others.size;
+            //kosong object lain
+            others.head->next = nullptr; //harus menunjuk nullptr
+            others.tail = others.head;//reset tail,tail menunjuk head(dummy node)
+            others.size = 0;
+        }
+        void splice_after(const Iterator pos,forward_lists& others,const Iterator first,const Iterator last){
+            Node* curr = pos.get_raw();
+            Node* start = others.head->next;
+            Node* other_begin = first.get_raw()->next;
+            Node* other_end = last.get_raw();
+            //linking other_end to curr->next
+            other_end->next =curr->next;
+            //lingking curr->next with to others_begin
+            curr->next = other_begin;
+
+            //update size
+            //karena linking dimulai dari node setelah posisi first
+            size += std::distance(next(first,last));
+            others.size -= size;
+
+            //kosongkan object lain
+            
+            tail = first.get_raw(); 
+
+        }
     public:
         /**
          * @brief method untuk print semua node list 

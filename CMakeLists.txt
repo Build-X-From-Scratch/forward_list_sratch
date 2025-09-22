@@ -26,6 +26,7 @@ FetchContent_MakeAvailable(googletest)
 
 # ==== Testing ====
 include(CTest)
+set(CMAKE_CTEST_ARGUMENTS "--timeout 5")
 enable_testing()
 
 add_executable(forward_list_test

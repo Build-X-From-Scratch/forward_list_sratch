@@ -213,17 +213,32 @@ TEST(Assign_test,Assign_testIII){
     }
     EXPECT_EQ(actual,expectations);
 }
-// TEST(splice_test,splice_testI){
-//     forward_lists<int>fl = {1,2,3};
-//     forward_lists<int>list = {10,20,30};
-//     fl.splice_after(fl.begin(),list);
-//     std::vector<int>expectations = {1,10,20,30,2,3};
-//     std::vector<int>actual;
-//     for(auto x: fl){
-//         actual.push_back(x);
-//     }
-//     EXPECT_EQ(fl.get_size(),6);
-//     EXPECT_EQ(list.get_size(),0);
-//     EXPECT_TRUE(!list.is_empty());
-//     EXPECT_EQ(actual,expectations);
-// }
+TEST(splice_test,splice_testI){
+    forward_lists<int>fl = {1,2,3};
+    forward_lists<int>list = {10,20,30};
+    fl.splice_after(fl.begin(),list);
+    std::vector<int>expectations = {1,10,20,30,2,3};
+    std::vector<int>actual;
+    for(auto x: fl){
+        actual.push_back(x);
+    }
+    EXPECT_EQ(fl.get_size(),6);
+    EXPECT_EQ(list.get_size(),0);
+    EXPECT_TRUE(list.is_empty());
+    EXPECT_EQ(actual,expectations);
+}
+TEST(splice_test,splice_testII){
+    forward_lists<int>fl = {100,200,300};
+    forward_lists<int>lists = {20,30,40};
+    EXPECT_EQ(fl.get_size(),3);
+    EXPECT_EQ(lists.get_size(),3);
+    fl.splice_after(fl.begin(),lists,lists.begin());
+    std::vector<int>expectations = {100,30,200,300};
+    std::vector<int>actual;
+    for(auto x: fl){
+        actual.push_back(x);
+    }
+    EXPECT_EQ(fl.get_size(),4);
+    EXPECT_EQ(lists.get_size(),2); 
+    EXPECT_EQ(actual,expectations);
+}
