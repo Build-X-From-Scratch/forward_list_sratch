@@ -242,3 +242,18 @@ TEST(splice_test,splice_testII){
     EXPECT_EQ(lists.get_size(),2); 
     EXPECT_EQ(actual,expectations);
 }
+TEST(splice_test,splice_testIII){
+    forward_lists<int>fl = {1000,2000,3000,4000,5000,6000};
+    forward_lists<int>lists = {1,2,3,4,5};
+    EXPECT_EQ(fl.get_size(),6);
+    EXPECT_EQ(lists.get_size(),5);
+    fl.splice_after(fl.begin(),lists,lists.begin(),lists.end());
+    std::vector<int>expectations = {1000,2,3,4,5,2000,3000,4000,5000,6000};
+    std::vector<int>actual;
+    for(auto x: fl){
+        actual.push_back(x);
+    }
+    EXPECT_EQ(fl.get_size(),10);
+    EXPECT_EQ(lists.get_size(),1); 
+    EXPECT_EQ(actual,expectations);
+}
