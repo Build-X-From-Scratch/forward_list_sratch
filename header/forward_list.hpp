@@ -768,6 +768,41 @@ class forward_lists{
 
         }
     public:
+        void swap(forward_lists& others)noexcept{
+            if(this == &others){//jika this sama dengan object lain
+                return;
+            }
+            //swap head;
+            Node* tempHead = head;
+            head = others.head;
+            others.head = tempHead;
+            //swap tail
+            Node* tempTail = tail;
+            tail = others.tail;
+            others.tail = tempTail;
+            //swap size
+            int tempSize = size;
+            size = others.size;
+            others.size = tempSize;
+        }
+        void swap(forward_lists&& others)noexcept{
+            if(this == &others){//jika this sama dengan object lain
+                return;
+            }
+            //swap head;
+            Node* tempHead = head;
+            head = others.head;
+            others.head = tempHead;
+            //swap tail
+            Node* tempTail = tail;
+            tail = others.tail;
+            others.tail = tempTail;
+            //swap size
+            int tempSize = size;
+            size = others.size;
+            others.size = tempSize;
+        }
+    public:
         /**
          * @brief method untuk print semua node list 
          * 
