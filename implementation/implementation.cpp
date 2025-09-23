@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <iterator>
 #include "../header/forward_list.hpp"
 int main(){
     std::cout << "Pop Front" << std::endl;
@@ -84,5 +85,17 @@ int main(){
    // list.print_all(list.begin(),list.end());
     list.assign({1,2,3,4,5});
     list.print_all(list.begin(),list.end());
+     forward_lists<int> a = {1, 2, 3};
+    forward_lists<int> b = {100, 200, 300, 400, 500};
+
+    // pindahkan elemen (200,300,400) dari b ke setelah a.before_begin()
+    //auto it1 = b.begin();     // menunjuk 100
+    //auto it2 = (b.begin(), 4); // menunjuk 500
+
+    a.splice_after(a.before_begin(), b, b.begin(), b.end());
+
+    for (int x : a) std::cout << x << " ";  // 200 300 400 1 2 3
+    std::cout << "\n";
+    for (int x : b) std::cout << x << " ";  // 100 500
     return 0;
 }   

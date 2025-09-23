@@ -156,9 +156,37 @@ class forward_lists{
             private:
                 Node* node;
             public:
-            Iterator(Node* n){
-                this->node = n;
-            }   
+                /**
+                 * @brief iterator category 
+                 * iterator category adalah label yang menjelaskan kemampuan
+                 * sebuah 
+                 * 
+                 * @details Iterator traits
+                 * - iterator_category  
+                 * traits ini adalah menandakan kemampuan sebuah iterator pada
+                 * forward_list kita memakai forward_iterator dikarenakan singly
+                 * linked list hanya punya pointer next yang memunkinkan node hanya 
+                 * bisa bergerak maju
+                 * - value_type
+                 * traits ini adalah type data yg digunakan oleh forward_list
+                 * karena sudah ada Template,maka kita dapat langsung memakai Templates
+                 * tersebut
+                 * - difference_type
+                 * tipe integer untuk menyatakan selisih dua iterator,ini dipakai
+                 * pada std::distance untuk menghitung banyak node diantara 2 iterator
+                 * - using pointer = T*;
+                 * tipe pointer ke elemen yang ditunjuk iterator
+                 * - using reference = T&;
+                 * tipe referensi ke elemen,Memungkinkan penggunaan *it untuk mengakses elemen.
+                 */
+                using iterator_category = std::forward_iterator_tag;
+                using value_type        = T;
+                using difference_type   = std::ptrdiff_t;
+                using pointer           = T*;
+                using reference         = T&;
+                Iterator(Node* n){
+                    this->node = n;
+                }   
             friend std::ostream& operator<<(std::ostream& os,const Iterator& it){
                 if(it.node){
                     os << it.node->data;
@@ -169,6 +197,12 @@ class forward_lists{
                 }
                 T& operator*(){
                     return node->data;
+                }
+                reference operator*()const{
+                    return node->data;
+                }
+                pointer operator->()const{
+                    return &(node->data);
                 }
                 Iterator& operator++(){ //harus mengembalikan reference ke object saat ini
                     if(node) node = node->next;
@@ -588,7 +622,15 @@ class forward_lists{
          * method untuk memindahkan node dari satu list ke list lain
          * tanpa menyalin data,tetapi move node pointer
          * 
-         * @details Time complexity O(1),Space Complexity O(1)
+         * @details Time complexity overloads
+         * - void splice_after( const_iterator pos, forward_list& other ) -> O(1)
+         * - void splice_after( const_iterator pos, forward_list&& other ) -> O(1) 
+         * - void splice_after( const_iterator pos, forward_list& other,
+                   const_iterator it ) -> O(1)
+         * - void splice_after( const_iterator pos, forward_list&& other,
+                   const_iterator it ) ->O(1)
+         * - void splice_after( const_iterator pos, forward_list& other,
+                   const_iterator first, const_iterator last ) -> O(n)
          */
         void splice_after(const Iterator pos,forward_lists& others,const Iterator It){
             Node* src = It.get_raw();
@@ -640,7 +682,6 @@ class forward_lists{
             Node* src = pos.get_raw();//pos object saat ini
             Node* begin = others.head->next ; //begin object lain
             Node* end = others.tail; //end object lain
-
             end->next = src->next;
             src->next = begin;
             //update tail
@@ -655,23 +696,75 @@ class forward_lists{
             others.size = 0;
         }
         void splice_after(const Iterator pos,forward_lists& others,const Iterator first,const Iterator last){
+            //relingking dari range (first,last)
             Node* curr = pos.get_raw();
-            Node* start = others.head->next;
             Node* other_begin = first.get_raw()->next;
             Node* other_end = last.get_raw();
-            //linking other_end to curr->next
-            other_end->next =curr->next;
-            //lingking curr->next with to others_begin
+            Node* after_node = curr->next; //simpan first this
+            if(other_begin == other_end){
+                return; //nullptr   
+            }
+            //update size,update size sebelum di linking
+            auto moved = (std::distance(first, last)) - 1;
+            size += moved;
+            others.size -= moved;
+            //simpan last_node
+            Node* last_node = other_begin;
+            //cari node sebelum lasr
+            while(last_node->next != other_end){
+                last_node = last_node->next;
+                //loop sampai last_node tepat menunjuk sebelum pos last
+            }
+            //sembungkan ke list tujuan
+            last_node->next = curr->next;
             curr->next = other_begin;
+            //lingking curr->next with to others_begin  
 
-            //update size
-            //karena linking dimulai dari node setelah posisi first
-            size += std::distance(next(first,last));
-            others.size -= size;
+            //update tail
+            if(after_node == tail || other_end == nullptr){
+                tail = last_node;
+            }
+            //relingking object lain
+            first.get_raw()->next = other_end;
+            if(other_end == nullptr){
+                others.tail = first.get_raw();
+            }
 
-            //kosongkan object lain
-            
-            tail = first.get_raw(); 
+        }
+        void splice_after(const Iterator pos,forward_lists&& others,const Iterator first,const Iterator last){
+            //relingking dari range (first,last)
+            Node* curr = pos.get_raw();
+            Node* other_begin = first.get_raw()->next;
+            Node* other_end = last.get_raw();
+            Node* after_node = curr->next;
+            if(other_begin == other_end){
+                return; //nullptr   
+            }
+            //update size,update size sebelum di linking
+            auto moved = std::distance(std::next(first),(last));
+            size += moved;
+            Node* last_node = other_begin;
+            others.size -= moved;
+            //cari node sebelum lasr
+            while(last_node->next != other_end){
+                last_node = last_node->next;
+                //loop sampai last_node tepat menunjuk sebelum pos last
+            }
+            //sembungkan ke list tujuan
+            last_node->next = curr->next;
+            curr->next = other_begin;
+            //lingking curr->next with to others_begin  
+
+            //update tail
+            Node* new_begin = first.get_raw();
+            if(after_node == tail){
+                tail = last_node;
+            }
+            //relingking object lain
+            first.get_raw()->next = other_end;
+            if(other_end == nullptr){
+                others.tail = first.get_raw();
+            }
 
         }
     public:
