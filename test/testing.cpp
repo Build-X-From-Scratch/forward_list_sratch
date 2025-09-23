@@ -257,3 +257,21 @@ TEST(splice_test,splice_testIII){
     EXPECT_EQ(lists.get_size(),1); 
     EXPECT_EQ(actual,expectations);
 }
+TEST(Modifiers_testing,swap_testing){
+    forward_lists<int>fl = {100,200,300,400};
+    forward_lists<int>list = {12,13,14,15,16,17};
+    EXPECT_EQ(fl.get_size(),4);
+    EXPECT_EQ(list.get_size(),6);
+    std::vector<int>expectation_a = {12,13,14,15,16,17};
+    std::vector<int>expectation_b = {100,200,300,400};
+    std::vector<int>actual_a,actual_b;
+    fl.swap(list);
+    for(auto x: fl){
+        actual_a.push_back(x);
+    }
+    for(auto x: list){
+        actual_b.push_back(x);
+    }
+    EXPECT_EQ(actual_a,expectation_a);
+    EXPECT_EQ(actual_b,expectation_b);
+}
