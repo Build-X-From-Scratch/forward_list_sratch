@@ -1,3 +1,26 @@
+/*
+MIT License
+
+Copyright (c) 2025 Build X  From  Scratch
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
 #include <iostream>
 #include <initializer_list>
 #include <type_traits>
@@ -7,33 +30,69 @@
 #include <concepts>
 #ifndef __forwardList
 #define __forwardList
+/**
+ * 
+ */
 template <typename It>
 concept my_input_iterator = requires(It it){
     *it; //bisa di deferencing
     ++it; //bisa post increment
     it++; //bisa pre increment
 };
-template <typename T>
+template <typename T,typename Allocator = std::allocator<T>>
 class forward_lists{
     private:
         struct Node{
             T data;
             Node* next;
-            Node(const T& data = T{},Node* n = nullptr){
-                this->data = data;
-                this->next = n;
-            }
         };
-        int size;
-        Node* head;
-        Node* tail;
-    public:
-        forward_lists(){
-            this->head = new Node(T{});
-            this->head->next = nullptr;
-            this->tail = this->head;    
-            this->size = 0;
+        //allocator khusus node
+        using node_allocator_type = 
+        typename std::allocator_traits<Allocator>::template rebind_alloc<Node>;
+        using node_traits = std::allocator_traits<node_allocator_type>;
+        node_allocator_type alloc; //instance allocator
+        Node* head  = nullptr; //head pointer
+        Node* tail; //tail pointer
+        int size; //banyak element pada linked list
+    /**
+     * @brief Allocator explanation
+     * Allocator adalah abstraksi cara mengelola memory pada container
+     * alih2 melakukan new dan delete,STL memakai allocator yaitu semacam
+     * policy class yang akan menentukan:
+     * 1.bagaimana alokasi memory dilakukan(allocate)
+     * 2.bagaimana membangun object di memori(construct)
+     * 3.bagaimana menghancurkan object(destroy)
+     * 4.bagaimana membebaskan memory(deallocate)
+     * 
+     * @details policy class
+     * Policy class adalah konsep desain di C++ di mana sebuah class tidak
+     * menentukan perilaku sendiri, tapi “mendelegasikan” perilaku tertentu
+     * ke class lain
+     */
+    private:
+        Node* _create_node(const T& value){
+            Node* n = node_traits::allocate(alloc,1); //alokasi memory mentah sebanyak 1 blok memory untuk node(allocate)
+            try{
+                node_traits::construct(alloc,std::addressof(n->data),value); //membangun object di memory(construct)
+            }catch(...){ //catch all handler
+                node_traits::deallocate(alloc,n,1); //dealokasi
+            }
+            //set next menjadi null
+            n->next = nullptr;
+            //kembalikan node
+            return n;
         }
+        void _destroy_node(Node* n)noexcept{
+                node_traits::destroy(alloc,std::addressof(n->data));
+                node_traits::deallocate(alloc,n,1);
+        }
+    public:
+    //default constructor allocator 
+        explicit forward_lists():
+            alloc(node_allocator_type()),head(_create_node(T{})),tail(head),size(0){}
+        //default constructor   
+        forward_lists(const Allocator& a):
+        alloc(a),head(_create_node(T{})),tail(head),size(0){}
         /**
          * @brief constructor range,adalah constructor yang menginialisasi nilai dari 
          * sebuah container dengan element dari suatu rentang  yang di tentukan oleh
@@ -44,16 +103,17 @@ class forward_lists{
         template <typename It>  
         requires my_input_iterator<It>
         forward_lists(It begin,It end){
-            head = new Node(T{});
+            Node* new_node = _create_node(T{}); //create dummy node
+            head = new_node;
             size = 0;
-            head->next = nullptr;
             tail = head;
             Node** curr = &head->next; //curr menunjuk head->next
             while(begin != end){
-                *curr = new Node(*begin); //isi node dengan deferencing begin
+                Node* n_node = _create_node(*begin);
+                *curr = n_node; //isi node dengan deferencing begin
                 tail = *curr;
                 curr = &((*curr)->next); //curr = curr->next
-                size++; //increment size
+                ++size; //increment size
                 ++begin; //increment iterator
             }
         }
@@ -62,17 +122,16 @@ class forward_lists{
          * @details time complexity O(n),Space Complexity O(n)
          */
         forward_lists(std::initializer_list<T> arr): head(nullptr){
-            head = new Node(T{});
-            head->next = nullptr;
+            Node* new_node = _create_node(T{});
+            head = new_node;
             tail = head;
             size = 0;
             Node** curr = &head->next; //store alamat memory head ke curr
             for(const T& it: arr){
-                *curr = new Node(it); //deference pointer
-                //head = new Node(it) ->meaning
-                tail = *curr;
+                Node* n_node = _create_node(it);
+                *curr = n_node; //curr menunjuk n_noed
+                tail = *curr; //tail ikut menunjuk curr
                 curr = &((*curr)->next); //store alamat curr->next
-               //curr = head->next
                //curr selalu menunjuk ke posisi kosong
                size++;
             }   
@@ -83,12 +142,12 @@ class forward_lists{
                 head = nullptr;
                 return;
             }
-            head = new Node(others.head->data);
-            head->next = new Node(others.head->next->data); //inialisasi data pertama
+            head = _create_node(T{}); //isi dummy 
+            head->next = _create_node(others.head->next->data); //inialisasi data pertama
             Node* curr = head->next; //pointer penggerak
-            Node* temp = others.head->next->next;
+            Node* temp = others.head->next->next; //mulai dari node ke 2
             while(temp != nullptr){
-                curr->next = new Node(temp->data);
+                curr->next = _create_node(temp->data);
                 curr = curr->next;
                 temp = temp->next;
             }
@@ -103,11 +162,12 @@ class forward_lists{
                 head = nullptr;
                 return *this;
             }
-            head->next = new Node(others.head->next->data); //inialisasi data pertama
+            head = _create_node(T{}); //isi dummy 
+            head->next = _create_node(others.head->next->data);//inialisasi data pertama
             Node* curr = head->next; //pointer penggerak
-            Node* temp = others.head->next->next;
+            Node* temp = others.head->next->next; //mulai dari node ke 2
             while(temp != nullptr){
-                curr->next = new Node(temp->data);
+                curr->next = _create_node(temp->data);
                 curr = curr->next;
                 temp = temp->next;
             }
@@ -121,7 +181,7 @@ class forward_lists{
          * karena head = others.head maka head == nullptr,akan mengakibatkan
          * undefined behavior
          */
-        forward_lists(forward_lists&& others) noexcept: head(new Node(T{})),tail(head),size(0){
+        forward_lists(forward_lists&& others) noexcept: head(_create_node(T{})),tail(head),size(0){
             head->next = others.head->next;
             tail = others.tail == head ? head: others.tail; //ternery operator,if you dont understand please read documentation 
             size = others.size;
@@ -147,9 +207,14 @@ class forward_lists{
                 others.size = 0;
             }
             return *this;
-        }   
+        }
+        /**
+         * @brief destructor
+         * - panggil method clear
+         * head harus tetap menunjuk dummy node
+         */
         ~forward_lists(){
-            clear();
+            clear(); //panggil method clear
         }
     private:
         class Iterator{
@@ -775,7 +840,7 @@ class forward_lists{
             //swap head;
             Node* tempHead = head;
             head = others.head;
-            others.head = tempHead;
+            others.head = tempHead; 
             //swap tail
             Node* tempTail = tail;
             tail = others.tail;
@@ -823,9 +888,9 @@ class forward_lists{
     void clear(){
         Node* curr = head->next;   // mulai dari setelah dummy
         while(curr != nullptr){
-            Node* temp = curr;
-            curr = curr->next;
-            delete temp;
+            Node* next = curr->next; //simpan curr->next
+            _destroy_node(curr);  //hancurkan curr
+            curr = next;//curr menunjuk next
         }
         head->next = nullptr;  // dummy menunjuk ke kosong
         tail = head;           // tail kembali ke dummy
