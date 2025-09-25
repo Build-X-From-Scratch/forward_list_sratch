@@ -31,10 +31,20 @@ git merge upstream/main
 this project need linking implementation.cpp and header
 but for keep it simple developing,i create shell scripting
 - for compile 
+give permission
+```bash
+chmod +x compile.sh
+```
+run compile shell scripting
 ```bash
 ./compile.sh
 ```
 - for build unit testing
+give permisson
+```bash
+chmod +x build_testing.sh
+```
+run build_testing shell scripting
 ```bash
 ./build_testing.sh
 ```
