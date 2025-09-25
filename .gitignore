@@ -10,6 +10,8 @@ bin
 node_modules
 # build
 build
+
+src/merge_list.cpp
 # Binary output (keep bin structure but ignore contents during development)
 bin/*.exe
 bin/*.a
