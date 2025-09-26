@@ -48,14 +48,15 @@ int main(){
 | erase_after    | ✅ Done |
 | push_front     | ✅ Todo |
 | pop_front      | ✅ Todo |
-| reverse        | ⬜ Todo |
+| reverse        | ✅ Todo |
 | unique         | ⬜ Todo |
 | Unit Testing   | ✅ Todo |
 | Sort           | ⬜ Todo |
-| Swap           | ⬜ Todo |
+| Swap           | ✅ Todo |
 | emplace_back   | ⬜ Todo |
 | emplace_front  | ⬜ Todo |
-| Assign         | ⬜ Todo |
+| Assign         | ✅ Todo |
+| Merge          | ⬜ Todo |
 
 ## License
 https://github.com/Build-X-From-Scratch/forward_list_sratch/blob/main/LICENSE

@@ -866,6 +866,50 @@ class forward_lists{
             size = others.size;
             others.size = tempSize;
         }
+    private: //helper sort
+        Node* merge(Node* left, Node* right) {
+            if (!left) return right;
+            if (!right) return left;
+
+            if (left->data <= right->data) {
+                left->next = merge(left->next, right);
+                return left;
+            } else {
+                right->next = merge(left, right->next);
+                return right;
+            }
+        }
+        Node* getMiddle(Node* head){
+            //mulai dari note pertama
+            Node* slow = head->next;
+            Node* fast = head->next->next;
+            while(fast && fast->next){
+                slow = slow->next;
+                fast = fast->next->next;
+            }
+            return slow;
+        }
+        Node* helper(Node* head){
+            if(!head || !head->next){
+                return head;
+            }
+            Node* middle = getMiddle(head);
+            Node* nextMiddle = middle->next;
+            //putushkan hubungan list
+            middle->next = nullptr;
+            Node* left = helper(head);
+            Node* right = helper(nextMiddle);
+            return merge(left,right);
+        }
+    public:
+        void sort(){
+            head = helper(head);
+            Node* curr = head;
+            while(curr && curr->next){
+                curr = curr->next;
+            }
+            tail = curr;
+        }
     public:
         /**
          * @brief method untuk print semua node list 

@@ -44,7 +44,7 @@ give permisson
 ```bash
 chmod +x build_testing.sh
 ```
-run build_testing shell scripting
+run build_testing shell scripting   
 ```bash
 ./build_testing.sh
 ```
