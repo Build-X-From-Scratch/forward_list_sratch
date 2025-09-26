@@ -881,8 +881,8 @@ class forward_lists{
         }
         Node* getMiddle(Node* head){
             //mulai dari note pertama
-            Node* slow = head->next;
-            Node* fast = head->next->next;
+            Node* slow = head;
+            Node* fast = head->next;
             while(fast && fast->next){
                 slow = slow->next;
                 fast = fast->next->next;
@@ -903,7 +903,7 @@ class forward_lists{
         }
     public:
         void sort(){
-            head = helper(head);
+            head->next = helper(head->next  );
             Node* curr = head;
             while(curr && curr->next){
                 curr = curr->next;
