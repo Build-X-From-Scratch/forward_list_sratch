@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include <vector>
+#include <algorithm>
 #include "../header/forward_list.hpp"
 //TEST(suite name,TestName)
 TEST(Basic_stl,check_empty){
@@ -274,4 +275,79 @@ TEST(Modifiers_testing,swap_testing){
     }
     EXPECT_EQ(actual_a,expectation_a);
     EXPECT_EQ(actual_b,expectation_b);
+}
+TEST(Sort_testing,Sorting_testI){
+    forward_lists<int>list = {10,9,8,7,6,5};
+    EXPECT_EQ(list.get_size(), 6);
+    list.sort();
+    std::vector<int>expectations = {5,6,7,8,9,10};
+    std::vector<int>actual;
+    for(auto x: list){
+        actual.push_back(x);
+    }
+    EXPECT_EQ(actual,expectations);
+}
+TEST(Sort_testing, Sorting_with_comparator) {
+    // data awal
+    forward_lists<int> list = {42, 13, 7, 99, 5, 21, 88};
+    EXPECT_EQ(list.get_size(), 7);
+
+    // ---- test ascending (default) ----
+    list.sort(std::less<int>());
+    std::vector<int> expectations = {5, 7, 13, 21, 42, 88, 99};
+    std::vector<int> actual;
+    for (auto x : list) {
+        actual.push_back(x);
+    }
+    EXPECT_EQ(actual, expectations);
+
+    // ---- test descending ----
+    forward_lists<int> list2 = {42, 13, 7, 99, 5, 21, 88};
+    list2.sort(std::greater<int>());
+    expectations = {99, 88, 42, 21, 13, 7, 5};
+    actual.clear();
+    for (auto x : list2) {
+        actual.push_back(x);
+    }
+    EXPECT_EQ(actual, expectations);
+
+    // ---- test custom: urutkan berdasarkan digit terakhir ----
+    forward_lists<int> list3 = {42, 13, 7, 99, 5, 21, 88};
+    list3.sort([](int a, int b) {
+        return (a % 10) < (b % 10); // bandingkan berdasarkan satuan
+    });
+    expectations = {21, 42, 13, 5, 7, 88, 99}; 
+    // penjelasan: digit akhir = {1,2,3,5,7,8,9}
+    actual.clear();
+    for (auto x : list3) {
+        actual.push_back(x);
+    }
+    EXPECT_EQ(actual, expectations);
+}
+TEST(Sort_testing, Sorting_random_stress) {
+    const int N = 1000;
+    std::vector<int> input;
+    for (int i = 0; i < N; i++) {
+        input.push_back(rand() % 10000); // random angka
+    }
+
+    forward_lists<int> list;
+    for (int x : input) {
+        list.push_front(x);  // isi pakai push_front
+    }
+
+    // ground truth (pakai input asli, urutan nggak penting karena di-sort juga)
+    std::vector<int> expectations = input;
+    std::sort(expectations.begin(), expectations.end(), std::greater<int>());
+
+    // sort dengan comparator custom (descending)
+    list.sort(std::greater<int>());
+
+    // ambil hasil dari forward_list
+    std::vector<int> actual;
+    for (auto x : list) {
+        actual.push_back(x);
+    }
+
+    EXPECT_EQ(actual, expectations);
 }

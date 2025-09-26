@@ -21,6 +21,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+#include <functional>
 #include <iostream>
 #include <initializer_list>
 #include <type_traits>
@@ -879,6 +880,20 @@ class forward_lists{
                 return right;
             }
         }
+        // overload with parameter
+        template<typename compare = std::less<T>>
+        Node* merge(Node* left, Node* right,compare comp) {
+            if (!left) return right;
+            if (!right) return left;
+
+            if (comp(left->data, right->data)) {
+                left->next = merge(left->next, right,comp);
+                return left;
+            } else {
+                right->next = merge(left, right->next,comp);
+                return right;
+            }
+        }
         Node* getMiddle(Node* head){
             //mulai dari note pertama
             Node* slow = head;
@@ -901,11 +916,35 @@ class forward_lists{
             Node* right = helper(nextMiddle);
             return merge(left,right);
         }
+        template <typename compare>
+        Node* helper(Node* head,compare comp){
+            if(!head || !head->next){
+                return head;
+            }
+            Node* middle = getMiddle(head);
+            Node* nextMiddle = middle->next;
+            //putushkan hubungan list
+            middle->next = nullptr;
+            Node* left = helper(head,comp);
+            Node* right = helper(nextMiddle,comp);
+            return merge(left,right,comp);
+        }
     public:
         void sort(){
-            head->next = helper(head->next  );
+            head->next = helper(head->next);
             Node* curr = head;
             while(curr && curr->next){
+                curr = curr->next;
+            }
+            tail = curr;
+        }
+        template <typename Compare = std::less<T>>
+        void sort(Compare comp = Compare{}) {
+            head->next = helper(head->next, comp);
+
+            // update tail sekali
+            Node* curr = head;
+            while (curr && curr->next) {
                 curr = curr->next;
             }
             tail = curr;
