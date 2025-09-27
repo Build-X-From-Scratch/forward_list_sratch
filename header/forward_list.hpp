@@ -1078,6 +1078,86 @@ class forward_lists{
             others.tail = head;
             //update head
             head->next = dummy.next;
+        }    
+        template <typename compare = std::less<T>>
+        void merge(forward_lists& others,compare comp = compare{}){
+            if(this == &others){
+                return;
+            }
+            Node dummy(T{});
+            Node* temp = &dummy;
+            temp->next = nullptr;
+            Node* curr = head->next;
+            Node* pos = others.head->next;
+            while(curr && pos){
+                if(comp(curr->data, pos->data)){
+                    temp->next = curr;
+                    curr = curr->next;
+                }else{
+                    temp->next = pos;
+                    pos = pos->next;
+                    // temp = temp->next;
+                }
+                temp = temp->next;
+            }
+            //update tail
+            if(curr != nullptr){
+                temp->next = curr;
+                // tail = this->tail;
+            }else if(pos != nullptr){
+                temp->next = pos;
+                tail = others.tail;
+            }else{
+                tail = temp;
+            }
+            //update size
+            size += others.size;
+            others.size = 0;
+            //kosongkan lama
+            others.head->next = nullptr;
+            others.tail = head;
+            //update head
+            head->next = dummy.next;
+        }
+        template <typename compare = std::less<T>>
+        void merge(forward_lists&& others,compare comp = compare{}){
+            if(this == &others){
+                return;
+            }
+            Node dummy(T{});
+            Node* temp = &dummy;
+            temp->next = nullptr;
+            Node* curr = head->next;
+            Node* pos = others.head->next;
+            while(curr && pos){
+                if(comp(curr->data, pos->data)){
+                    temp->next = curr;
+                    curr = curr->next;
+                }else{
+                    temp->next = pos;
+                    pos = pos->next;
+                    // temp = temp->next;
+                }
+                temp = temp->next;
+            }
+            //update tail
+            if(curr != nullptr){
+                temp->next = curr;
+                // tail = this->tail;
+            }else if(pos != nullptr){
+                temp->next = pos;
+                tail = others.tail;
+            }else{
+                tail = temp;
+            }
+            //update size
+            size += others.size;
+            others.size = 0;
+            //kosongkan lama
+            others.head->next = nullptr;
+            others.tail = head;
+            //update head
+            head->next = dummy.next;
         }
     public:
         /**
