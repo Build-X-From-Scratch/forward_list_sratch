@@ -1,7 +1,28 @@
 #include <gtest/gtest.h>
 #include <vector>
+#include <numeric>
 #include <algorithm>
 #include "../header/forward_list.hpp"
+// ==== Helper Function ====
+template<typename T>
+void check_merge_result(forward_lists<T>& dest,
+                        forward_lists<T>& donor,
+                        const std::vector<T>& expected)
+{
+    // donor harus kosong
+    EXPECT_TRUE(donor.is_empty());
+
+    // size harus sesuai
+    EXPECT_EQ(dest.get_size(), expected.size());
+
+    // isi harus sama
+    std::vector<T> actual;
+    for (auto x : dest) {
+        actual.push_back(x);
+    }
+    EXPECT_EQ(actual, expected);
+}
+
 //TEST(suite name,TestName)
 TEST(Basic_stl,check_empty){
     forward_lists<int>fl;
@@ -373,4 +394,148 @@ TEST(pop_testing,pop_back_test){
     EXPECT_EQ(list.get_size(),2);
     list.pop_back();
     EXPECT_EQ(list.get_size(),1);
+}
+TEST(merge_testing,Merge_testI){
+    forward_lists<int>fl = {1,2,3};
+    forward_lists<int>list = {4,5,6};
+    list.merge(fl);
+    EXPECT_TRUE(fl.is_empty());
+    std::vector<int>expectations = {1,2,3,4,5,6};
+    std::vector<int>actual;
+    for(auto x: list){
+        actual.push_back(x);
+    }
+    EXPECT_EQ(actual,expectations);
+}
+TEST(merge_testing, Merge_StressTest) {
+    // merge banyak list kecil -> jadi satu list panjang
+    const int N = 1000; // jumlah list
+    const int M = 10;   // ukuran tiap list
+    std::vector<forward_lists<int>> lists;
+    lists.reserve(N);
+
+    // siapkan banyak list dengan isi unik
+    int counter = 0;
+    for (int i = 0; i < N; i++) {
+        forward_lists<int> fl;
+        for (int j = 0; j < M; j++) {
+            fl.push_back(counter++);
+        }
+        lists.push_back(std::move(fl));
+    }
+
+    // merge semua list ke list pertama
+    for (int i = 1; i < N; i++) {
+        lists[0].merge(lists[i]);
+        EXPECT_TRUE(lists[i].is_empty());  // donor harus kosong
+    }
+
+    // cek ukuran akhir
+    EXPECT_EQ(lists[0].get_size(), N * M);
+
+    // cek isi urut sesuai konstruksi
+    std::vector<int> actual;
+    for (auto x : lists[0]) {
+        actual.push_back(x);
+    }
+
+    std::vector<int> expected(N * M);
+    std::iota(expected.begin(), expected.end(), 0); // 0..N*M-1
+
+    EXPECT_EQ(actual, expected);
+}
+
+TEST(merge_testing, Merge_WithEmptyLists) {
+    forward_lists<int> fl1 = {1,2,3};
+    forward_lists<int> empty;
+
+    // merge dengan list kosong
+    fl1.merge(empty);
+    EXPECT_TRUE(empty.is_empty());
+    EXPECT_EQ(fl1.get_size(), 3);
+
+    // merge list kosong ke list isi
+    empty.merge(fl1);
+    EXPECT_TRUE(fl1.is_empty());
+    EXPECT_EQ(empty.get_size(), 3);
+
+    std::vector<int> actual;
+    for (auto x : empty) {
+        actual.push_back(x);
+    }
+    std::vector<int> expected = {1,2,3};
+    EXPECT_EQ(actual, expected);
+}
+
+TEST(merge_testing, Merge_SelfMerge) {
+    forward_lists<int> fl = {1,2,3};
+    fl.merge(fl); // harus tidak crash dan tidak berubah
+    EXPECT_EQ(fl.get_size(), 3);
+
+    std::vector<int> actual;
+    for (auto x : fl) {
+        actual.push_back(x);
+    }
+    std::vector<int> expected = {1,2,3};
+    EXPECT_EQ(actual, expected);
+}
+TEST(merge_testing, Merge_BasicGlobalRef) {
+    forward_lists<int> fl = {1,2,3};
+    forward_lists<int> list = {4,5,6};
+
+    list.merge(fl);
+
+    check_merge_result(list, fl, {1,2,3,4,5,6});
+}
+
+TEST(merge_testing, Merge_EmptyGlobalRef) {
+    forward_lists<int> fl = {1,2,3};
+    forward_lists<int> empty;
+
+    // merge empty ke fl
+    fl.merge(empty);
+    check_merge_result(fl, empty, {1,2,3});
+
+    // merge fl ke empty
+    empty.merge(fl);
+    check_merge_result(empty, fl, {1,2,3});
+}
+
+TEST(merge_testing, Merge_SelfGlobalRef) {
+    forward_lists<int> fl = {1,2,3};
+    fl.merge(fl); // STL-like: no-op
+
+    EXPECT_EQ(fl.get_size(), 3);
+
+    std::vector<int> actual;
+    for (auto x : fl) {
+        actual.push_back(x);
+    }
+    EXPECT_EQ(actual, (std::vector<int>{1,2,3}));
+}
+
+TEST(merge_testing, Merge_StressGlobalRef) {
+    const int N = 500;
+    const int M = 20;
+
+    std::vector<forward_lists<int>> lists;
+    lists.reserve(N);
+
+    int counter = 0;
+    for (int i = 0; i < N; i++) {
+        forward_lists<int> fl;
+        for (int j = 0; j < M; j++) {
+            fl.push_back(counter++);
+        }
+        lists.push_back(std::move(fl));
+    }
+
+    for (int i = 1; i < N; i++) {
+        lists[0].merge(lists[i]);
+    }
+
+    std::vector<int> expected(N * M);
+    std::iota(expected.begin(), expected.end(), 0);
+
+    check_merge_result(lists[0], lists[N-1], expected);
 }
