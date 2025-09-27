@@ -360,6 +360,9 @@ class forward_lists{
         T back()const noexcept{
             return this->tail->data;
         }
+        Allocator get_allocator()const noexcept{
+            return alloc;
+        }
     public:
         /**
          * @brief method untuk insertion val pada pos front
@@ -1158,6 +1161,47 @@ class forward_lists{
             others.tail = head;
             //update head
             head->next = dummy.next;
+        }
+    public:
+        /**
+        * @brief resize adalah method untuk mengubah ukuran sebuah list
+        * - If count is equal to the current size, does nothing.
+        * - If the current size is greater than count, the container is reduced to its first count elements.
+        * - If the current size is less than count, then:
+        *    -1) Additional default-inserted elements are appended.
+        *    -2) Additional copies of value are appended.
+        *@details
+        */
+        void resize(std::size_t count){
+            if(count == size){
+                return;
+            }else if(count > size){
+                while(size < count){
+                    push_back(0);
+                    size++;
+                }
+            }else{
+                while(size > count){
+                    pop_back();
+                    size--;
+                }
+            }   
+        }
+        void resize(std::size_t count,const T& value){
+            if(count == size){
+                return;
+            }else if(count > size){
+                while(size < count){
+                    push_back(value);
+                    size++;
+                }
+            }else{
+                while(size > count){
+                    pop_back();
+                    size--;
+                }
+            }
+
         }
     public:
         /**
