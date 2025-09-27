@@ -409,6 +409,57 @@ class forward_lists{
             size--;
             
         }
+    public:
+        /**
+        * @brief adalah method untuk melakukan insertion dari posisi belakang(tail)
+        * @details time complexity O(1)
+        */
+        void push_back(const T& value){
+            if(!head->next){
+                head->next = tail = _create_node(value);
+                size++;
+            }else{
+                tail->next = _create_node(value);
+                tail = tail->next;
+                size++;
+            }
+        }
+        void push_back(T&& value){
+            if(!head->next){
+                head->next = tail = _create_node(value);
+                size++;
+            }else{
+                tail->next = _create_node(value);
+                tail = tail->next;
+                size++;
+            }
+        }
+        /**
+        @brief pop_back adalah method untuk deletion node di posisi tail
+        @details time complexity O(n),Space complexity O(1)
+        */
+        void pop_back(){
+            if(!head->next){//is_empty
+                return;
+            }else if(!head->next->next){
+                Node* temp = tail;
+                tail = head;
+                tail->next = nullptr;
+                size--;
+                _destroy_node(temp);
+            }else{
+                Node* curr = head->next;
+                while(curr->next->next != nullptr){
+                    curr = curr->next;
+                }
+                Node* temp = curr->next;
+                tail = curr;
+                tail->next = nullptr;
+                size--;
+                _destroy_node(temp);
+            }
+        }
+    public:
         /**
          * @brief Menyisipkan elemen setelah posisi iterator tertentu.
          *
