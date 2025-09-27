@@ -351,3 +351,26 @@ TEST(Sort_testing, Sorting_random_stress) {
 
     EXPECT_EQ(actual, expectations);
 }
+TEST(Insert_testing,push_back_testing){
+    forward_lists<int>list;
+    EXPECT_TRUE(list.is_empty());
+    list.push_back(1);
+    EXPECT_EQ(list.get_size(),1);
+    list.push_back(2);
+     EXPECT_EQ(list.get_size(),2);
+    list.push_back(3);
+     EXPECT_EQ(list.get_size(),3);
+    std::vector<int>expectations = {1,2,3};
+    std::vector<int>actual;
+    for(auto x: list){
+        actual.push_back(x);
+    }
+    EXPECT_EQ(actual,expectations);
+}
+TEST(pop_testing,pop_back_test){
+    forward_lists<int>list = {1,2,3};
+    list.pop_back();
+    EXPECT_EQ(list.get_size(),2);
+    list.pop_back();
+    EXPECT_EQ(list.get_size(),1);
+}
