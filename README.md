@@ -51,12 +51,12 @@ int main(){
 | reverse        | ✅ Todo |
 | unique         | ⬜ Todo |
 | Unit Testing   | ✅ Todo |
-| Sort           | ⬜ Todo |
+| Sort           | ✅ Todo |
 | Swap           | ✅ Todo |
 | emplace_back   | ⬜ Todo |
 | emplace_front  | ⬜ Todo |
 | Assign         | ✅ Todo |
-| Merge          | ⬜ Todo |
+| Merge          | ✅ Todo |
 
 ## License
 https://github.com/Build-X-From-Scratch/forward_list_sratch/blob/main/LICENSE
