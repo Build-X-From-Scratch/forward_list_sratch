@@ -8,6 +8,35 @@
 ## Introductions
 Maybe I Not Sure for this introduction,i am not smart for write this stupid Introduction,i just focus to get
 best result
+# Structure Directory
+```cpp
+.
+├── build_failed.sh //shell scripting for build and testing
+├── build_testing.sh
+├── CMakeLists.txt
+├── commitlint.config.js
+├── compile_commands.json -> build/compile_commands.json
+├── compile.sh
+├── compile_sort.sh //
+├── CONTRIBUTING.MD
+├── header //header stl
+│   └── forward_list.hpp
+├── implementation //implementantian stl
+│   ├── implementation.cpp
+│   └── implementation_sort.cpp
+├── LICENSE
+├── package.json
+├── package-lock.json
+├── README.md
+├── refactor.md
+├── src //prototype implementasi method 
+│   ├── forward_list.cpp
+│   ├── merge_list.cpp
+│   └── merge_sort.cpp
+├── test //unit testing
+│   └── testing.cpp
+└── testing.md
+```
 ## Requirements
 - Compiler: g++ 10+/clang++ 12+
 - OS: Linux(recomended),MacOS,Mikocok
