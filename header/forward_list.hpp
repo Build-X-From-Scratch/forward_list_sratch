@@ -26,6 +26,7 @@ SOFTWARE.
 #include <initializer_list>
 #include <type_traits>
 #include <iterator>
+#include <unordered_set>
 #include <cstddef>
 #include <limits>
 #include <concepts>
@@ -38,6 +39,7 @@ concept my_input_iterator = requires(It it){
     it++; //bisa pre increment
 };
 template <typename T,typename Allocator = std::allocator<T>>
+//buat namespace polymorphic allocator
 class forward_lists{
     private:
         struct Node{
@@ -1163,6 +1165,49 @@ class forward_lists{
             head->next = dummy.next;
         }
     public:
+        void merge_sort(forward_lists& others){
+            if(this == &others){ 
+                return;
+            }
+            if(head->next->data <= others.head->next->data){
+                //sambung mulai tail dengan head.tail
+                tail->next = others.head->next;
+                //update tail
+                tail = others.tail;
+                //update size
+                size += others.size;
+                others.head->next = nullptr;
+                others.tail = others.head;
+            }else{
+                others.tail->next = head->next;
+                //update head pada this
+                head->next = others.head->next;
+                //update size
+                size += others.size;
+            }
+
+        }
+        void merge_sort(forward_lists&& others){
+            if(this == &others){
+                return;
+            }
+            if(head->next->data <= others.head->next->data){
+                //sambung tail
+                tail->next = others->head->next;
+                //update tail
+                tail = others.tail;
+                //update size
+                size += others.size;
+            }else{
+                //sambung others tail ke node setelah dummy
+                others.tail->next = head->next;
+                //sambung node setelah du
+                head->next = others.head->next;
+                //update size
+                size += others.size;
+            }
+        }
+    public:
         /**
         * @brief resize adalah method untuk mengubah ukuran sebuah list
         * - If count is equal to the current size, does nothing.
@@ -1202,6 +1247,54 @@ class forward_lists{
                 }
             }
 
+        }
+    public:
+    //time complexity O(n),Space Complexity O(n)
+        void uniqe_all(){
+            std::unordered_set<T>seen;
+            Node* curr = head;
+            Node* fast = head->next;
+            if(!fast){
+                return;//jika list kosong
+            }
+            while(fast != nullptr){
+                if(seen.find(fast->data) != seen.end()){
+                    Node* temp = fast;
+                    Node* _next = fast->next;
+                    //relinking curr dengan fast->next
+                    curr->next =  _next;
+                    _destroy_node(temp);
+                    if(_next != nullptr){
+                        fast = _next;
+                        // curr = curr->next;//melompat 2 kali
+                    }else{
+                        fast = nullptr;
+                    }
+                }else{
+                    seen.insert(fast->data);
+                    curr = curr->next; //maju sekali jika tidak ada di set
+                    fast = fast->next;
+                }
+            }
+        }
+        void uniqe(){
+            Node* curr = head;
+            Node* fast = head->next;
+            if(fast == nullptr){
+                return; 
+            }
+            while(fast && fast->next){
+                if(fast->data == fast->next->data){
+                    Node* temp = fast;
+                    Node* _next = fast->next;
+                    curr->next = _next;
+                    _destroy_node(temp);
+                    fast = _next;
+                }else{
+                    curr = curr->next;
+                    fast = fast->next;
+                }
+            }
         }
     public:
         /**
