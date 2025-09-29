@@ -38,6 +38,7 @@ concept my_input_iterator = requires(It it){
     it++; //bisa pre increment
 };
 template <typename T,typename Allocator = std::allocator<T>>
+//buat namespace polymorphic allocator
 class forward_lists{
     private:
         struct Node{
@@ -1161,6 +1162,49 @@ class forward_lists{
             others.tail = head;
             //update head
             head->next = dummy.next;
+        }
+    public:
+        void merge_sort(forward_lists& others){
+            if(this == &others){ 
+                return;
+            }
+            if(head->next->data <= others.head->next->data){
+                //sambung mulai tail dengan head.tail
+                tail->next = others.head->next;
+                //update tail
+                tail = others.tail;
+                //update size
+                size += others.size;
+                // others.head->next = nullptr;
+                // others.tail = others.head;
+            }else{
+                others.tail->next = head->next;
+                //update head pada this
+                head->next = others.head->next;
+                //update size
+                size += others.size;
+            }
+
+        }
+        void merge_sort(forward_lists&& others){
+            if(this == &others){
+                return;
+            }
+            if(head->next->data <= others.head->next->data){
+                //sambung tail
+                tail->next = others->head->next;
+                //update tail
+                tail = others.tail;
+                //update size
+                size += others.size;
+            }else{
+                //sambung others tail ke node setelah dummy
+                others.tail->next = head->next;
+                //sambung node setelah du
+                head->next = others.head->next;
+                //update size
+                size += others.size;
+            }
         }
     public:
         /**
