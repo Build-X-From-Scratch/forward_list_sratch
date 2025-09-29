@@ -539,3 +539,34 @@ TEST(merge_testing, Merge_StressGlobalRef) {
 
     check_merge_result(lists[0], lists[N-1], expected);
 }
+TEST(merge_sort,merge_sort_testingI){
+    forward_lists<int>list = {1,2,3};
+    forward_lists<int>fl = {4,5,6};
+    list.merge_sort(fl);
+    std::vector<int>expectation = {1,2,3,4,5,6};
+    std::vector<int>actual;
+    for(auto x: list){
+        actual.push_back(x);
+    }
+    EXPECT_EQ(actual,expectation);
+}   
+TEST(niqe_testing,delete_global){
+    forward_lists<int>list = {1, 2, 2, 3, 4, 4, 4, 5, 5};
+    list.uniqe_all();
+    std::vector<int>expectation = {1, 2, 3, 4, 5};
+    std::vector<int>actual;
+    for(auto x: list){
+        actual.push_back(x);
+    }
+    EXPECT_EQ(actual,expectation);
+}
+TEST(unique_testing,adjency_duplicate){
+    forward_lists<int> list = { 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 2, 4, 4 }; 
+    list.uniqe();
+    std::vector<int>expectations = {1,2,3,2,4};
+    std::vector<int>actual;
+    for(auto x: list){
+        actual.push_back(x);
+    }
+    EXPECT_EQ(actual,expectations);
+}
