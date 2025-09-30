@@ -1335,6 +1335,79 @@ class forward_lists{
         }
     public:
         /**
+        * @brief overload remove untuk menghapus node dengan nilai
+        * sama dengan parameter value
+        * @param value nilai node yang ingin dihapus pada list
+        * @details Time complexity
+        * Best case: O(1),jika hanya node dan berada di pos head->next
+        * average case: O(n)
+        * worst case: O(n),tetapi menghapus semua node pada list
+        */
+        void remove(const T& value){
+            if(!head->next){ //list is empty
+                return;
+            }
+            Node* curr = head;
+            while(curr->next != nullptr){
+                if(curr->next->data == value){
+                    Node* _next = curr->next;
+                    if(_next == tail){
+                        curr->next = nullptr;
+                        tail = curr;
+                        tail->next = nullptr;
+                    }else{
+                        curr->next = _next->next;
+                    }
+                    size--;
+                    _destroy_node(_next);
+                }else{
+                    curr = curr->next;
+                }
+            }
+            if(!head->next){
+                tail = head;    
+                size = 0;
+            }
+        }
+    
+        /**
+        * @brief method overload remove,untuk menghapus node pada posisi pos
+        * @param pos posisi node yang ingin dihapus
+        * @details Time complexity
+        * best case: O(1) jika pos di head->next(node pertama)
+        * average case: O(n) jika pos ditengah list
+        * worst case: O(n) jika pos diakhir list(tail)
+        */
+        void remove(std::size_t pos){
+            if(!head->next){
+                return;
+            }
+            if(pos >= static_cast<std::size_t>(size)){
+                return;
+            }
+
+            //- 1 1 1 2 2 
+            Node* prev = head;
+            Node* curr = head->next;
+            for(std::size_t i = 0;i < pos;i++){
+                prev = curr;
+                curr = curr->next;
+            }
+            //sekarang curr menunjuk pos
+            if(curr == tail){
+                curr = nullptr;
+                tail = curr;
+            }else{  
+                prev->next = curr->next;
+            }
+            size--;
+            _destroy_node(curr);
+            if(!head->next){
+                tail = head;
+            }
+        }
+    public:
+        /**
          * @brief method untuk print semua node list 
          * 
          * @details Time complexity O(n),Space Complexity O(n)
