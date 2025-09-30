@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include <vector>
 #include <numeric>
+#include <ranges>
 #include <algorithm>
 #include "../header/forward_list.hpp"
 // ==== Helper Function ====
@@ -569,4 +570,234 @@ TEST(unique_testing,adjency_duplicate){
         actual.push_back(x);
     }
     EXPECT_EQ(actual,expectations);
+}
+TEST(assign_range,container_testing){
+    forward_lists<int>list = {1,2,3};
+    EXPECT_EQ(list.get_size(),3);
+    std::vector<int>assgn = {100,200,300};
+    list.assign_range(assgn);
+    std::vector<int>expectation = {100,200,300};
+    std::vector<int>actual;
+    for(auto x: list){
+        actual.push_back(x);
+    }
+    EXPECT_EQ(actual,expectation);
+    EXPECT_EQ(list.get_size(),3);
+}
+#include <gtest/gtest.h>
+#include <vector>
+#include <ranges>
+#include <numeric>   // iota
+#include <algorithm> // transform
+
+#include "forward_list.hpp"
+
+// 1) Assign dari range kosong ke list non-empty
+TEST(assign_range, empty_range_overwrites_nonempty) {
+    forward_lists<int> list = {1,2,3,4,5};
+    ASSERT_EQ(list.get_size(), 5u);
+
+    std::vector<int> empty;
+    EXPECT_NO_THROW(list.assign_range(empty));
+
+    std::vector<int> actual;
+    for (auto &x : list) actual.push_back(x);
+
+    EXPECT_TRUE(actual.empty());
+    EXPECT_EQ(list.get_size(), 0u);
+}
+
+// 2) Assign dari vector besar (stress ukuran)
+TEST(assign_range, large_vector_stress) {
+    constexpr int N = 100000;
+    std::vector<int> big(N);
+    std::iota(big.begin(), big.end(), 0);
+
+    forward_lists<int> list = {42};
+    list.assign_range(big);
+
+    ASSERT_EQ(list.get_size(), static_cast<size_t>(N));
+
+    // Build actual sekali, lalu cek beberapa titik
+    std::vector<int> actual;
+    actual.reserve(N);
+    for (auto &x : list) actual.push_back(x);
+
+    ASSERT_EQ(actual.size(), static_cast<size_t>(N));
+    EXPECT_EQ(actual.front(), 0);
+    EXPECT_EQ(actual[12345], 12345);
+    EXPECT_EQ(actual.back(), N - 1);
+}
+
+// 3) Assign dari iota view (lazy input range)
+TEST(assign_range, iota_view_basic) {
+    auto rng = std::views::iota(10, 20); // 10..19
+
+    forward_lists<int> list;
+    list.assign_range(rng);
+
+    std::vector<int> expectation(10);
+    std::iota(expectation.begin(), expectation.end(), 10);
+
+    std::vector<int> actual;
+    for (auto &x : list) actual.push_back(x);
+
+    EXPECT_EQ(actual, expectation);
+    EXPECT_EQ(list.get_size(), expectation.size());
+}
+
+// 4) Assign dari pipeline view (filter + transform)
+TEST(assign_range, filtered_transformed_view) {
+    std::vector<int> base(50);
+    std::iota(base.begin(), base.end(), 0);
+
+    auto even_squares =
+        base
+        | std::views::filter([](int x){ return x % 2 == 0; })
+        | std::views::transform([](int x){ return x * x; });
+
+    forward_lists<int> list = {-1,-2,-3};
+    list.assign_range(even_squares);
+
+    std::vector<int> expectation;
+    expectation.reserve(25);
+    for (int i = 0; i < 50; i += 2) expectation.push_back(i * i);
+
+    std::vector<int> actual;
+    for (auto &x : list) actual.push_back(x);
+
+    EXPECT_EQ(actual, expectation);
+    EXPECT_EQ(list.get_size(), expectation.size());
+}
+
+// 5) Repeated assign dengan ukuran naik-turun
+TEST(assign_range, repeated_resizing) {
+    forward_lists<int> list;
+
+    // a) kosong -> kecil
+    list.assign_range(std::initializer_list<int>{7,8});
+    {
+        std::vector<int> actual;
+        for (auto &x : list) actual.push_back(x);
+        EXPECT_EQ(actual, (std::vector<int>{7,8}));
+        EXPECT_EQ(list.get_size(), 2u);
+    }
+
+    // b) kecil -> besar
+    std::vector<int> vbig(5000);
+    std::iota(vbig.begin(), vbig.end(), 1);
+    list.assign_range(vbig);
+    {
+        std::vector<int> actual;
+        actual.reserve(5000);
+        for (auto &x : list) actual.push_back(x);
+        ASSERT_EQ(actual.size(), 5000u);
+        EXPECT_EQ(actual.front(), 1);
+        EXPECT_EQ(actual.back(), 5000);
+        EXPECT_EQ(list.get_size(), 5000u);
+    }
+
+    // c) besar -> sangat kecil
+    list.assign_range(std::initializer_list<int>{42});
+    {
+        std::vector<int> actual;
+        for (auto &x : list) actual.push_back(x);
+        EXPECT_EQ(actual, (std::vector<int>{42}));
+        EXPECT_EQ(list.get_size(), 1u);
+    }
+
+    // d) kecil -> kosong
+    std::vector<int> empty;
+    list.assign_range(empty);
+    {
+        std::vector<int> actual;
+        for (auto &x : list) actual.push_back(x);
+        EXPECT_TRUE(actual.empty());
+        EXPECT_EQ(list.get_size(), 0u);
+    }
+}
+
+// 6) Assign dari initializer_list langsung
+TEST(assign_range, initializer_list_direct) {
+    forward_lists<int> list = {9,9,9};
+    list.assign_range({100,200,300,400});
+
+    std::vector<int> expectation = {100,200,300,400};
+    std::vector<int> actual;
+    for (auto &x : list) actual.push_back(x);
+
+    EXPECT_EQ(actual, expectation);
+    EXPECT_EQ(list.get_size(), expectation.size());
+}
+
+// 7) Assign dari container lain (forward_lists -> forward_lists via buffer)
+TEST(assign_range, from_another_forward_lists) {
+    forward_lists<int> src = {5,4,3,2,1};
+    forward_lists<int> dst = {42};
+
+    // buffer aman (hindari self-assign langsung)
+    std::vector<int> buffer;
+    for (auto &x : src) buffer.push_back(x);
+
+    dst.assign_range(buffer);
+
+    std::vector<int> actual;
+    for (auto &x : dst) actual.push_back(x);
+
+    EXPECT_EQ(actual, (std::vector<int>{5,4,3,2,1}));
+    EXPECT_EQ(dst.get_size(), 5u);
+}
+
+// 8) Stress: banyak round dengan views berbeda-beda
+TEST(assign_range, many_views_mixed_stress) {
+    forward_lists<int> list;
+
+    for (int round = 0; round < 50; ++round) {
+        int start = round * 10;
+        int stop  = start + 10;
+        auto rng = std::views::iota(start, stop);
+
+        if (round % 2 == 0) {
+            auto evens = rng | std::views::filter([](int x){ return x % 2 == 0; });
+            list.assign_range(evens);
+
+            std::vector<int> expectation;
+            for (int x = start; x < stop; ++x) if (x % 2 == 0) expectation.push_back(x);
+
+            std::vector<int> actual;
+            for (auto &v : list) actual.push_back(v);
+
+            EXPECT_EQ(actual, expectation);
+            EXPECT_EQ(list.get_size(), expectation.size());
+        } else {
+            auto odds_sq = rng
+                | std::views::filter([](int x){ return x % 2 != 0; })
+                | std::views::transform([](int x){ return x * x; });
+            list.assign_range(odds_sq);
+
+            std::vector<int> expectation;
+            for (int x = start; x < stop; ++x) if (x % 2 != 0) expectation.push_back(x * x);
+
+            std::vector<int> actual;
+            for (auto &v : list) actual.push_back(v);
+
+            EXPECT_EQ(actual, expectation);
+            EXPECT_EQ(list.get_size(), expectation.size());
+        }
+    }
+}
+
+// 9) Robustness: hindari self-assign langsung (copy terlebih dahulu)
+TEST(assign_range, avoid_self_assign_by_copy_first) {
+    forward_lists<int> list = {1,2,3,4};
+    std::vector<int> buffer;
+    for (auto &x : list) buffer.push_back(x);
+
+    EXPECT_NO_THROW(list.assign_range(buffer));
+
+    std::vector<int> actual;
+    for (auto &x : list) actual.push_back(x);
+
+    EXPECT_EQ(actual, (std::vector<int>{1,2,3,4}));
+    EXPECT_EQ(list.get_size(), 4u);
 }
