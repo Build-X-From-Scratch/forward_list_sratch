@@ -1,4 +1,5 @@
 #include <gtest/gtest.h>
+#include <cstddef>
 #include <vector>
 #include <numeric>
 #include <ranges>
@@ -800,4 +801,115 @@ TEST(assign_range, avoid_self_assign_by_copy_first) {
 
     EXPECT_EQ(actual, (std::vector<int>{1,2,3,4}));
     EXPECT_EQ(list.get_size(), 4u);
+}
+TEST(remove,remove_single_value){
+    forward_lists<int>list = {1,2,3,4,5};
+    EXPECT_EQ(list.get_size(),5);
+    // int value = 3;
+    list.remove(3);
+    EXPECT_EQ(list.get_size(),4);
+    std::vector<int>expectation = {1,2,4,5};
+    std::vector<int>actual;
+    for(auto x: list){
+        actual.push_back(x);
+    }
+    EXPECT_EQ(actual,expectation);
+}
+TEST(remove,remove_single_value_on_tail){
+    forward_lists<int>list = {1,2,3,4,5};
+    EXPECT_EQ(list.get_size(),5);
+    EXPECT_EQ(list.back(),5);
+    // int value = 5;
+    list.remove(5);
+    EXPECT_EQ(list.get_size(),4);
+    std::vector<int>expectation ={1,2,3,4};
+    std::vector<int>actual;
+    for(auto x: list){
+        actual.push_back(x);
+    }
+    EXPECT_EQ(list.back(),4);
+    EXPECT_EQ(actual,expectation);
+}
+TEST(remove,remove_node_on_pos){
+    forward_lists<int>list = {1,2,3,4,5};
+    EXPECT_EQ(list.get_size(),5);
+    // int value = 5;
+    std::size_t pos = 3;
+    list.remove(pos);
+    EXPECT_EQ(list.get_size(),4);
+    std::vector<int>expectation ={1, 2, 3, 5};
+    std::vector<int>actual;
+    for(auto x: list){
+        actual.push_back(x);
+    }
+    EXPECT_EQ(actual,expectation);
+}
+TEST(remove, stress_remove_various_cases){
+    // Case 1: remove dari list kosong
+    forward_lists<int> list_empty;
+    EXPECT_EQ(list_empty.get_size(),0);
+    list_empty.remove(10); // should not crash
+    EXPECT_EQ(list_empty.get_size(),0);
+
+    // Case 2: remove head (pos=0)
+    forward_lists<int> list1 = {1,2,3,4,5};
+    list1.remove(0);
+    EXPECT_EQ(list1.get_size(),4);
+    std::vector<int> expected1 = {2,3,4,5};
+    std::vector<int> actual1;
+    for(auto x: list1) actual1.push_back(x);
+    EXPECT_EQ(actual1, expected1);
+
+    // Case 3: remove tail by value
+    forward_lists<int> list2 = {10,20,30};
+    list2.remove(30);
+    EXPECT_EQ(list2.get_size(),2);
+    EXPECT_EQ(list2.back(),20);
+
+    // Case 4: remove middle value
+    forward_lists<int> list3 = {7,8,9,10};
+    list3.remove(9);
+    EXPECT_EQ(list3.get_size(),3);
+    std::vector<int> expected3 = {7,8,10};
+    std::vector<int> actual3;
+    for(auto x: list3) actual3.push_back(x);
+    EXPECT_EQ(actual3, expected3);
+
+    // Case 5: remove semua elemen dengan loop (stress kecil)
+    forward_lists<int> list4 = {1,2,3,4,5};
+    for(int i=0;i<5;i++){
+        list4.remove(0); // selalu hapus head
+    }
+    EXPECT_EQ(list4.get_size(),0);
+    EXPECT_EQ(list4.begin(), list4.end()); // list kosong
+
+    // Case 6: hapus value yang tidak ada
+    forward_lists<int> list5 = {1,2,3};
+    list5.remove(99); // nothing to remove
+    EXPECT_EQ(list5.get_size(),3);
+    std::vector<int> expected5 = {1,2,3};
+    std::vector<int> actual5;
+    for(auto x: list5) actual5.push_back(x);
+    EXPECT_EQ(actual5, expected5);
+
+    // Case 7: stress banyak elemen
+    forward_lists<int> list6;
+    for(int i=0;i<1000;i++){
+        list6.push_back(i);
+    }
+    EXPECT_EQ(list6.get_size(),1000);
+
+    // remove beberapa posisi penting
+    list6.remove(0);            // hapus head
+    list6.remove(500);          // hapus tengah
+    list6.remove(list6.get_size()-1); // hapus tail
+
+    EXPECT_EQ(list6.get_size(),997);
+
+    // sanity check: nilai 0 sudah terhapus
+    bool found0 = false;
+    for(auto x: list6){
+        if(x == 0) found0 = true;
+    }
+    EXPECT_FALSE(found0);
 }
