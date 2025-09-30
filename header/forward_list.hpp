@@ -25,6 +25,7 @@ SOFTWARE.
 #include <iostream>
 #include <initializer_list>
 #include <type_traits>
+#include <ranges>
 #include <iterator>
 #include <unordered_set>
 #include <cstddef>
@@ -1293,6 +1294,42 @@ class forward_lists{
                 }else{
                     curr = curr->next;
                     fast = fast->next;
+                }
+            }
+        }
+    public:
+        template<std::ranges::input_range R>
+        void assign_range(R&& rg){
+            clear();
+            size = 0;
+            Node* curr = head;
+            for(auto&& elem: rg){
+                if(!curr){
+                    size++;
+                    curr->next = tail = _create_node(elem);
+                }else{
+                    Node* new_node = _create_node(elem);
+                    curr->next = new_node;
+                    curr = curr->next; //majukan curr
+                    tail = curr; //tail menunjuk currr
+                    size++;
+                }
+            }
+        }
+        // template<typename T>
+        void assign_range(std::initializer_list<T> arr){
+            clear();
+            size = 0;
+            Node* curr = head;
+            for(const T& x: arr){
+                if(!curr){
+                    curr->next = tail = _create_node(x);
+                    size++;
+                }else{
+                    curr->next = _create_node(x);
+                    curr = curr->next;
+                    tail = curr;
+                    size++;
                 }
             }
         }
