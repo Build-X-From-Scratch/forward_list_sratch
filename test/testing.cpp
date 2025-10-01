@@ -844,72 +844,79 @@ TEST(remove,remove_node_on_pos){
     }
     EXPECT_EQ(actual,expectation);
 }
-TEST(remove, stress_remove_various_cases){
-    // Case 1: remove dari list kosong
-    forward_lists<int> list_empty;
-    EXPECT_EQ(list_empty.get_size(),0);
-    list_empty.remove(10); // should not crash
-    EXPECT_EQ(list_empty.get_size(),0);
+TEST(remove, remove_from_empty_list) {
+    forward_lists<int> list;
+    EXPECT_EQ(list.get_size(), 0);
+    list.remove(10); // harusnya aman
+    EXPECT_EQ(list.get_size(), 0);
+}
 
-    // Case 2: remove head (pos=0)
-    forward_lists<int> list1 = {1,2,3,4,5};
-    list1.remove(0);
-    EXPECT_EQ(list1.get_size(),4);
-    std::vector<int> expected1 = {2,3,4,5};
-    std::vector<int> actual1;
-    for(auto x: list1) actual1.push_back(x);
-    EXPECT_EQ(actual1, expected1);
+TEST(remove, remove_head_by_pos) {
+    forward_lists<int> list = {1,2,3,4,5};
+    list.remove(0);
+    EXPECT_EQ(list.get_size(), 4);
 
-    // Case 3: remove tail by value
-    forward_lists<int> list2 = {10,20,30};
-    list2.remove(30);
-    EXPECT_EQ(list2.get_size(),2);
-    EXPECT_EQ(list2.back(),20);
+    std::vector<int> expected = {2,3,4,5};
+    std::vector<int> actual;
+    for(auto x: list) actual.push_back(x);
+    EXPECT_EQ(actual, expected);
+}
 
-    // Case 4: remove middle value
-    forward_lists<int> list3 = {7,8,9,10};
-    list3.remove(9);
-    EXPECT_EQ(list3.get_size(),3);
-    std::vector<int> expected3 = {7,8,10};
-    std::vector<int> actual3;
-    for(auto x: list3) actual3.push_back(x);
-    EXPECT_EQ(actual3, expected3);
+TEST(remove, remove_tail_by_value) {
+    forward_lists<int> list = {10,20,30};
+    list.remove(30);
+    EXPECT_EQ(list.get_size(), 2);
+    EXPECT_EQ(list.back(), 20);
+}
 
-    // Case 5: remove semua elemen dengan loop (stress kecil)
-    forward_lists<int> list4 = {1,2,3,4,5};
-    for(int i=0;i<5;i++){
-        list4.remove(0); // selalu hapus head
+TEST(remove, remove_middle_by_value) {
+    forward_lists<int> list = {7,8,9,10};
+    list.remove(9);
+    EXPECT_EQ(list.get_size(), 3);
+
+    std::vector<int> expected = {7,8,10};
+    std::vector<int> actual;
+    for(auto x: list) actual.push_back(x);
+    EXPECT_EQ(actual, expected);
+}
+
+TEST(remove, remove_all_elements_by_pos) {
+    forward_lists<int> list = {1,2,3,4,5};
+    for(int i=0; i<5; i++) {
+        list.remove(0); // selalu hapus head
     }
-    EXPECT_EQ(list4.get_size(),0);
-    EXPECT_EQ(list4.begin(), list4.end()); // list kosong
+    EXPECT_EQ(list.get_size(), 0);
+    EXPECT_EQ(list.begin(), list.end()); // list kosong
+}
 
-    // Case 6: hapus value yang tidak ada
-    forward_lists<int> list5 = {1,2,3};
-    list5.remove(99); // nothing to remove
-    EXPECT_EQ(list5.get_size(),3);
-    std::vector<int> expected5 = {1,2,3};
-    std::vector<int> actual5;
-    for(auto x: list5) actual5.push_back(x);
-    EXPECT_EQ(actual5, expected5);
+TEST(remove, remove_non_existent_value) {
+    forward_lists<int> list = {1,2,3};
+    list.remove(99); // tidak ada 99
+    EXPECT_EQ(list.get_size(), 3);
 
-    // Case 7: stress banyak elemen
-    forward_lists<int> list6;
-    for(int i=0;i<1000;i++){
-        list6.push_back(i);
+    std::vector<int> expected = {1,2,3};
+    std::vector<int> actual;
+    for(auto x: list) actual.push_back(x);
+    EXPECT_EQ(actual, expected);
+}
+
+TEST(remove, stress_remove_many_elements) {
+    forward_lists<int> list;
+    for(int i=0; i<1000; i++) {
+        list.push_back(i);
     }
-    EXPECT_EQ(list6.get_size(),1000);
+    EXPECT_EQ(list.get_size(), 1000);
 
-    // remove beberapa posisi penting
-    list6.remove(0);            // hapus head
-    list6.remove(500);          // hapus tengah
-    list6.remove(list6.get_size()-1); // hapus tail
+    list.remove(0);                     // hapus head
+    list.remove(500);                   // hapus tengah
+    list.remove(list.get_size()-1);     // hapus tail
 
-    EXPECT_EQ(list6.get_size(),997);
+    EXPECT_EQ(list.get_size(), 997);
 
-    // sanity check: nilai 0 sudah terhapus
+    // pastikan nilai 0 sudah tidak ada
     bool found0 = false;
-    for(auto x: list6){
-        if(x == 0) found0 = true;
+    for(auto x: list) {
+        if(x == 0) { found0 = true; break; }
     }
     EXPECT_FALSE(found0);
 }
