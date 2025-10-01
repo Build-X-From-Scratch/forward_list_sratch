@@ -285,6 +285,9 @@ class forward_lists{
                 bool operator!=(const Iterator& others)const{
                     return node != others.node;
                 }
+                bool operator==(const Iterator& others)const{
+                    return node == others.node;
+                }
                 Node* get_raw()const{
                     return node;
                 }
@@ -716,7 +719,7 @@ class forward_lists{
         }
         void assign(std::initializer_list<T> arr){
             clear();
-            head = new Node(T{});
+            head = _create_node(T{});
             head->next = nullptr;
             Node** curr = &head->next;
             //size++;
@@ -1378,7 +1381,7 @@ class forward_lists{
         * average case: O(n) jika pos ditengah list
         * worst case: O(n) jika pos diakhir list(tail)
         */
-        void remove(std::size_t pos){
+        void remove(const std::size_t pos){
             if(!head->next){
                 return;
             }
@@ -1389,14 +1392,18 @@ class forward_lists{
             //- 1 1 1 2 2 
             Node* prev = head;
             Node* curr = head->next;
+            static_assert(std::is_same_v<decltype(curr), Node*>);
+            static_assert(std::is_same_v<decltype(tail), Node*>);
+
             for(std::size_t i = 0;i < pos;i++){
                 prev = curr;
                 curr = curr->next;
             }
             //sekarang curr menunjuk pos
             if(curr == tail){
+                head->next = nullptr;
                 curr = nullptr;
-                tail = curr;
+                tail = head;
             }else{  
                 prev->next = curr->next;
             }
@@ -1404,6 +1411,7 @@ class forward_lists{
             _destroy_node(curr);
             if(!head->next){
                 tail = head;
+                size = 0;
             }
         }
     public:
