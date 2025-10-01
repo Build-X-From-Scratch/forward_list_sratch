@@ -6,52 +6,44 @@
 </p>
 
 ## Introductions
-Maybe I Not Sure for this introduction,i am not smart for write this stupid Introduction,i just focus to get
-best result
-# Structure Directory
+This project is a custom implementation of the C++ Standard Template Library (STL) **forward_list**.  
+The goal is to understand how the STL container works internally by building it from scratch,  
+including various member functions, iterators, and algorithms such as sort, merge, and reverse.
+
+## Project Structure
 ```cpp
 .
-├── build_failed.sh //shell scripting for build and testing
-├── build_testing.sh
-├── CMakeLists.txt
-├── commitlint.config.js
-├── compile_commands.json -> build/compile_commands.json
-├── compile.sh
-├── compile_sort.sh //
-├── CONTRIBUTING.MD
-├── header //header stl
-│   └── forward_list.hpp
-├── implementation //implementantian stl
-│   ├── implementation.cpp
-│   └── implementation_sort.cpp
-├── LICENSE
-├── package.json
-├── package-lock.json
-├── README.md
-├── refactor.md
-├── src //prototype implementasi method 
-│   ├── forward_list.cpp
-│   ├── merge_list.cpp
-│   └── merge_sort.cpp
-├── test //unit testing
-│   └── testing.cpp
-└── testing.md
+├── build_failed.sh        // Script for simulating failed build
+├── build_testing.sh       // Script for running unit tests
+├── CMakeLists.txt         // CMake configuration
+├── compile.sh             // Compile main implementation
+├── compile_sort.sh        // Compile sorting-related code
+├── CONTRIBUTING.md        // Contribution guidelines
+├── header/                // Header files
+│   └── forward_list.hpp   // Forward list template implementation
+├── implementation/        // Implementation details
+│   ├── implementation.cpp
+│   └── implementation_sort.cpp
+├── LICENSE                // License file (MIT)
+├── src/                   // Source code prototypes
+│   ├── forward_list.cpp
+│   ├── merge_list.cpp
+│   └── merge_sort.cpp
+├── test/                  // Unit tests
+│   └── testing.cpp
+└── README.md              // Project documentation
 ```
 ## Requirements
-- Compiler: g++ 10+/clang++ 12+
-- OS: Linux(recomended),MacOS,Mikocok
+- **Compiler**: g++ 10+/clang++ 12+
+- **OS**: Linux(recomended),MacOS,Mikocok
 ## Instalation
 Clone this repo
 ```bash
 git clone https://github.com/Build-X-From-Scratch/forward_list_sratch.git
 ```
-copy header to your project,if your in directory your project
-```cpp
-cp -r forward_list_sratch/header/forward_lists.hpp
-```
-if you not on directory project
+### copy header to your project
 ```bash
-cp -r forward_list_sratch/header/forward_lists.hpp your directory
+cp -r forward_list_sratch/header/forward_list.hpp .
 ```
 
 ## example 
@@ -68,7 +60,18 @@ int main(){
     return 0;
 }   
 ```
+## Compile
+if you use g++ then:
+```bash
+g++ -stdc=c++20 example.cpp -o example
+./example
+```
+if you use clang then:
 
+```bash
+clang++ -stdc=c++20 example -o example
+./example
+```
 ## 📌 TODO (Next Features)
 
 | Feature        | Status |
@@ -88,4 +91,5 @@ int main(){
 | Merge          | ✅ Todo |
 
 ## License
-https://github.com/Build-X-From-Scratch/forward_list_sratch/blob/main/LICENSE
+This project is licensed under the [MIT License](./LICENSE).  
+You are free to use, modify, and distribute it with proper attribution.
