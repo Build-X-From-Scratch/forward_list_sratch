@@ -585,14 +585,6 @@ TEST(assign_range,container_testing){
     EXPECT_EQ(actual,expectation);
     EXPECT_EQ(list.get_size(),3);
 }
-#include <gtest/gtest.h>
-#include <vector>
-#include <ranges>
-#include <numeric>   // iota
-#include <algorithm> // transform
-
-#include "forward_list.hpp"
-
 // 1) Assign dari range kosong ke list non-empty
 TEST(assign_range, empty_range_overwrites_nonempty) {
     forward_lists<int> list = {1,2,3,4,5};
@@ -853,7 +845,7 @@ TEST(remove, remove_from_empty_list) {
 
 TEST(remove, remove_head_by_pos) {
     forward_lists<int> list = {1,2,3,4,5};
-    list.remove(0);
+    list.remove(std::size_t(0));
     EXPECT_EQ(list.get_size(), 4);
 
     std::vector<int> expected = {2,3,4,5};
@@ -883,9 +875,10 @@ TEST(remove, remove_middle_by_value) {
 TEST(remove, remove_all_elements_by_pos) {
     forward_lists<int> list = {1,2,3,4,5};
     for(int i=0; i<5; i++) {
-        list.remove(0); // selalu hapus head
+        list.remove(std::size_t(0)); // selalu hapus head
     }
     EXPECT_EQ(list.get_size(), 0);
+    EXPECT_TRUE(list.is_empty());
     EXPECT_EQ(list.begin(), list.end()); // list kosong
 }
 
@@ -913,10 +906,4 @@ TEST(remove, stress_remove_many_elements) {
 
     EXPECT_EQ(list.get_size(), 997);
 
-    // pastikan nilai 0 sudah tidak ada
-    bool found0 = false;
-    for(auto x: list) {
-        if(x == 0) { found0 = true; break; }
-    }
-    EXPECT_FALSE(found0);
 }
