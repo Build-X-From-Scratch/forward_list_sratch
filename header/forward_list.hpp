@@ -1432,16 +1432,66 @@ class forward_lists{
          * berguna pada destructor
          * @details time complexity O(n),Space Complexity O(n)
          */
-    void clear(){
-        Node* curr = head->next;   // mulai dari setelah dummy
-        while(curr != nullptr){
-            Node* next = curr->next; //simpan curr->next
-            _destroy_node(curr);  //hancurkan curr
-            curr = next;//curr menunjuk next
+    public:
+        template <std::ranges::input_range R>
+        void insert_range_after(const Iterator& pos,R&& r){
+            Node* curr = pos.get_raw();
+            if(is_empty()){
+                Node* _next = curr->next; //nullptr
+                   for(auto&& x: r){
+                    curr->next = _create_node(x);
+                    curr = curr->next;
+                    size++;
+                }
+                //linking node terakhir r ke _next
+                curr->next = _next;
+                tail = curr;
+            }else{
+                Node* _next = curr->next;
+                for(auto&& x: r){
+                    curr->next = _create_node(x);
+                    curr = curr->next;
+                    size++;
+                }
+                //linking node terakhir r ke _next
+                curr->next = _next;
+            }
         }
-        head->next = nullptr;  // dummy menunjuk ke kosong
-        tail = head;           // tail kembali ke dummy
-        size = 0;
-    }
+    public:
+        template<std::ranges::input_range R>
+        void prepend_range(R&& r){
+            if(is_empty()){
+                Node* curr = head;
+                Node* _next = head->next; //nullptr
+                for(auto&& x: r){
+                    curr->next = _create_node(x);
+                    curr = curr->next;
+                    size++;
+                }
+                curr->next = _next;
+                tail = curr; 
+            }else{
+                Node* curr = head;
+                Node* _next = head->next;
+                for(auto&& x: r){
+                    curr->next = _create_node(x);
+                    curr = curr->next;
+                    size++;
+                }
+                curr->next = _next; 
+            }
+        }
+    public:
+        void clear(){
+            Node* curr = head->next;   // mulai dari setelah dummy
+            while(curr != nullptr){
+                Node* next = curr->next; //simpan curr->next
+                _destroy_node(curr);  //hancurkan curr
+                curr = next;//curr menunjuk next
+            }
+            head->next = nullptr;  // dummy menunjuk ke kosong
+            tail = head;           // tail kembali ke dummy
+            size = 0;
+        }
 };
 #endif
