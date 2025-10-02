@@ -907,3 +907,57 @@ TEST(remove, stress_remove_many_elements) {
     EXPECT_EQ(list.get_size(), 997);
 
 }
+TEST(emplace_testing,emplace_front_testing){
+    forward_lists<int>list = {1,2,3};
+    EXPECT_EQ(list.get_size(),3);
+    list.emplace_front(5);
+    EXPECT_EQ(list.get_size(),4);
+    std::vector<int>expectation = {5,1,2,3};
+    std::vector<int>actual;
+    for(auto x: list){
+        actual.push_back(x);
+    }
+    EXPECT_EQ(actual,expectation);
+}   
+TEST(emplace_testing,emplace_back_testing){
+    forward_lists<int>list = {1,2,3};
+    EXPECT_EQ(list.get_size(),3);
+    list.emplace_front(5);
+    EXPECT_EQ(list.get_size(),4);
+    list.emplace_back(10);
+    std::vector<int>expectation = {5,1,2,3,10};
+    EXPECT_EQ(list.get_size(),5);
+    std::vector<int>actual;
+    for(auto x: list){
+        actual.push_back(x);
+    }
+    EXPECT_EQ(actual,expectation);
+}   
+TEST(emplace_testing,emplace_front_testing_empty){
+    forward_lists<int>list;
+    EXPECT_TRUE(list.is_empty());
+    list.emplace_front(1);
+    EXPECT_TRUE(!list.is_empty());
+    list.emplace_front(2);
+    list.emplace_front(3);
+    std::vector<int>expectation = {3,2,1};
+    std::vector<int>actual;
+    for(auto x: list){
+        actual.push_back(x);
+    }
+    EXPECT_EQ(actual,expectation);
+}
+TEST(emplace_testing,emplace_back_testing_empty){
+    forward_lists<int>list;
+    EXPECT_TRUE(list.is_empty());
+    list.emplace_back(1);
+    EXPECT_TRUE(!list.is_empty());
+    list.emplace_back(2);
+    list.emplace_back(3);
+    std::vector<int>expectation = {1,2,3};
+    std::vector<int>actual;
+    for(auto x: list){
+        actual.push_back(x);
+    }
+    EXPECT_EQ(actual,expectation);
+}
