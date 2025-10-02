@@ -1414,6 +1414,67 @@ class forward_lists{
                 tail = head;
                 size = 0;
             }
+        }  
+        std::size_t remove_count(const T& value){
+            if(!head->next){ //list is empty
+                return 0;
+            }
+            int cnt = 0;
+            Node* curr = head;
+            while(curr->next != nullptr){
+                if(curr->next->data == value){
+                    Node* _next = curr->next;
+                    if(_next == tail){
+                        curr->next = nullptr;
+                        tail = curr;
+                        tail->next = nullptr;
+                    }else{
+                        curr->next = _next->next;
+                    }
+                    size--;
+                    cnt++;
+                    _destroy_node(_next);
+                }else{
+                    curr = curr->next;
+                }
+            }
+            if(!head->next){
+                tail = head;    
+                size = 0;
+            }
+            return cnt;
+        } 
+        template <class UnaryPred>
+        requires(std::predicate<UnaryPred&, const T&>)
+        void remove_if(UnaryPred p){
+            if(!head->next){
+                return;
+            }
+            Node* curr = head->next;
+            Node* prev = head;
+            while(curr != nullptr){
+                if(p(curr->data)){
+                    Node* _next = curr->next;
+                    // Node* temp = curr;
+                    //relink pada next
+                    prev->next = _next;
+                    if(_next == nullptr){//curr == tail
+                        tail = prev;
+                    }
+                    //majukan curr
+                    _destroy_node(curr);
+                    size--;
+                    curr = _next;
+                }else{
+                    prev = curr;
+                    curr = curr->next;
+                }
+            }
+            if(!head->next){ //jika terhapus semua
+                tail = head;
+                head->next = nullptr;
+                size = 0;
+            }
         }
     public:
         /**
