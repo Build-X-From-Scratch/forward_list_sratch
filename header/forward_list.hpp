@@ -31,6 +31,7 @@ SOFTWARE.
 #include <cstddef>
 #include <limits>
 #include <concepts>
+#include <utility>
 #ifndef __forwardList
 #define __forwardList
 template <typename It>
@@ -1480,6 +1481,46 @@ class forward_lists{
                 }
                 curr->next = _next; 
             }
+        }
+    public:
+        template <class ... Args>
+        void emplace_front(Args&&... args){
+            Node* new_node = _create_node(std::forward<Args>(args)...);
+            //linking head baru ke head lama
+            if(!head->next){
+                tail = new_node;
+            }
+            new_node->next = head->next;
+            //update head;
+            head->next = new_node;
+            //update size;
+            size++;
+        }
+        template <class  ... Args>
+        void emplace_after(Iterator pos,Args&&... args){
+            Node* curr = pos.get_raw();
+            if(!curr){
+                return;
+            }
+            Node* _next = curr->next;
+            Node* new_node = _create_node(std::forward<Args>(args)...);
+
+            //linking
+            new_node->next = _next;
+            curr->next = new_node;
+            //emplace pada saat list kosong
+            if(curr == tail){
+                tail = new_node;
+            }
+            size++;
+        }
+        template<class... Args>
+        void emplace_back(Args&&... args){
+            Node* new_node = _create_node(std::forward<Args>(args)...);
+            tail->next = new_node;
+            tail = new_node;
+            //update size
+            size++;
         }
     public:
         void clear(){
