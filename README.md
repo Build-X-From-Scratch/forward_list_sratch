@@ -81,12 +81,12 @@ clang++ -stdc=c++20 example -o example
 | push_front     | ✅ Todo |
 | pop_front      | ✅ Todo |
 | reverse        | ✅ Todo |
-| unique         | ⬜ Todo |
+| unique         | ✅ Todo |
 | Unit Testing   | ✅ Todo |
 | Sort           | ✅ Todo |
 | Swap           | ✅ Todo |
-| emplace_back   | ⬜ Todo |
-| emplace_front  | ⬜ Todo |
+| emplace_back   | ✅ Todo |
+| emplace_front  | ✅ Todo |
 | Assign         | ✅ Todo |
 | Merge          | ✅ Todo |
 
