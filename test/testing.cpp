@@ -951,13 +951,55 @@ TEST(emplace_testing,emplace_back_testing_empty){
     forward_lists<int>list;
     EXPECT_TRUE(list.is_empty());
     list.emplace_back(1);
+    EXPECT_EQ(list.get_size(),1);
     EXPECT_TRUE(!list.is_empty());
     list.emplace_back(2);
+    EXPECT_EQ(list.get_size(),2);
     list.emplace_back(3);
+    EXPECT_EQ(list.get_size(),3);
     std::vector<int>expectation = {1,2,3};
     std::vector<int>actual;
     for(auto x: list){
         actual.push_back(x);
     }
     EXPECT_EQ(actual,expectation);
+}
+TEST(remove_if,simple_remove_lambda){
+    forward_lists<int>list = {1,2,4,6,8,9,10};
+    // int k = 3;
+    list.remove_if([](int x){return x % 2 == 0;});
+    std::vector<int>expectation = {1,9};
+    std::vector<int>actual;
+    for(auto x: list){
+        actual.push_back(x);
+    }
+    EXPECT_EQ(actual,expectation);
+}
+TEST(remove_if,remove_until_empty){
+    forward_lists<int> list = {2,2,2,2,2,2,2,2};
+    list.remove_if([](int x){return x % 2 == 0 ;});
+    std::vector<int>expectation = {};
+    std::vector<int>actual;
+    EXPECT_TRUE(list.is_empty());
+    for(auto x: list){
+        actual.push_back(x);
+    }
+    EXPECT_EQ(actual,expectation);
+}
+TEST(remove_if,remove_stressTesting){
+    forward_lists<int>list;
+    int k = 10;
+    for(int i = 0;i <= 100;i++){
+        list.push_back(i);
+        list.remove_if([k](int x){return x <= k;});
+    }
+    std::vector<int>expectations;
+    for(int i = 11;i <= 100;i++){
+        expectations.push_back(i);
+    }
+    std::vector<int>actual;
+    for(auto x: list){
+        actual.push_back(x);
+    }
+    EXPECT_EQ(actual,expectations);
 }
