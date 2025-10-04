@@ -4,6 +4,7 @@
 #include <numeric>
 #include <ranges>
 #include <algorithm>
+#include <random>
 #include "../header/forward_list.hpp"
 // ==== Helper Function ====
 template<typename T>
@@ -1002,4 +1003,56 @@ TEST(remove_if,remove_stressTesting){
         actual.push_back(x);
     }
     EXPECT_EQ(actual,expectations);
+}
+
+TEST(remove_if,remove_super_StessTestin){
+constexpr size_t N = 1'000'000; // 1 juta elemen
+    forward_lists<long long> flist;
+
+    // generator angka random
+    std::mt19937_64 rng(12345); 
+    std::uniform_int_distribution<long long> dist(-1e12, 1e12);
+
+    // isi forward_list dengan N elemen random
+    for (size_t i = 0; i < N; ++i) {
+        flist.push_front(dist(rng));
+    }
+    flist.reverse(); // supaya urut sesuai insert
+
+    // predicate: hapus semua bilangan genap
+    auto is_even = [](long long x) { return x % 2 == 0; };
+
+    // jalankan remove_if
+    flist.remove_if(is_even);
+
+    // validasi: tidak ada lagi bilangan genap
+    for (const auto &x : flist) {
+        ASSERT_NE(x % 2, 0) << "Masih ada bilangan genap!";
+    }
+}
+TEST(remove_if_count,remove_until_empty){
+    forward_lists<int> list = {2,2,2,2,2,2,2,2};
+    int size = list.get_size();
+    auto cnt = list.remove_if_count([](int x){return x % 2 == 0 ;});
+    std::vector<int>expectation = {};
+    std::vector<int>actual;
+    EXPECT_TRUE(list.is_empty());
+    for(auto x: list){
+        actual.push_back(x);
+    }
+    EXPECT_EQ(actual,expectation);
+    EXPECT_EQ(cnt,size);
+}
+TEST(remove_count,simple_remove_count){
+    forward_lists<int>list = {1,2,3,1,1,2,3};
+    int new_size = list.get_size() - 3;
+    int x = 1;
+    list.remove_count(x);
+    EXPECT_EQ(list.get_size(),new_size);
+    std::vector<int>expectation = {2,3,2,3};
+    std::vector<int>actual;
+    for(auto x: list){
+        actual.push_back(x);
+    }
+    EXPECT_EQ(actual,expectation);
 }
