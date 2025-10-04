@@ -41,7 +41,6 @@ concept my_input_iterator = requires(It it){
     it++; //bisa pre increment
 };
 template <typename T,typename Allocator = std::allocator<T>>
-//buat namespace polymorphic allocator
 class forward_lists{
     private:
         struct Node{
@@ -1476,6 +1475,36 @@ class forward_lists{
                 size = 0;
             }
         }
+        template <class UnaryPred>
+        requires(std::predicate<UnaryPred&,const T&>)
+        std::size_t remove_if_count(UnaryPred p){
+            if(!head->next){
+                return 0;
+            }
+            std::size_t count = 0;
+            Node* curr = head->next;
+            Node* prev = head;
+            while(curr != nullptr){
+                if(p(curr->data)){
+                    Node* _next = curr->next;
+                    //linking prev
+                    prev->next = _next;
+                    //check _next;
+                    if(_next == nullptr){
+                        tail = prev;
+                        
+                    }
+                    _destroy_node(curr);
+                    size--;
+                    curr = _next;
+                    count++;//increment count
+                }else{
+                    prev = curr;
+                    curr = curr->next;
+                }
+            }
+            return count;
+        }
     public:
         /**
          * @brief method untuk print semua node list 
@@ -1529,7 +1558,7 @@ class forward_lists{
                     curr->next = _create_node(x);
                     curr = curr->next;
                     size++;
-                }
+                } 
                 curr->next = _next;
                 tail = curr; 
             }else{
