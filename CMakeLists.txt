@@ -29,6 +29,7 @@ include(CTest)
 set(CMAKE_CTEST_ARGUMENTS "--timeout 5")
 enable_testing()
 
+# Unit testing binary
 add_executable(forward_list_test
   test/testing.cpp
 )
@@ -38,3 +39,13 @@ target_link_libraries(forward_list_test
 
 include(GoogleTest)
 gtest_discover_tests(forward_list_test)
+
+# ==== Benchmarking ====
+find_package(benchmark REQUIRED)
+
+add_executable(forward_list_bench
+  benchmarking/benchmarking.cpp
+)
+target_link_libraries(forward_list_bench
+  PRIVATE forward_list_lib benchmark::benchmark pthread
+)
