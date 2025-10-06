@@ -1056,3 +1056,12 @@ TEST(remove_count,simple_remove_count){
     }
     EXPECT_EQ(actual,expectation);
 }
+TEST(getter,cycle_testing){
+    forward_lists<int>list = {1,2,3,4};
+    EXPECT_FALSE(list.check_cycle());
+}
+TEST(getter,middle_testing){
+    forward_lists<int>list = {1,2,3,4,5};
+    int mid = list.get_middle();
+    EXPECT_EQ(mid,3);
+}   
