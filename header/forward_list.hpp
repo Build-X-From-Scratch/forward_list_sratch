@@ -369,6 +369,27 @@ class forward_lists{
         Allocator get_allocator()const noexcept{
             return alloc;
         }
+        bool check_cycle()const noexcept{
+            Node* slow = head->next;
+            Node* fast = head->next;
+            while(slow && fast && fast->next != nullptr){
+                slow = slow->next;
+                fast = fast->next->next;
+                if(fast == slow){
+                    return true;
+                }
+            }
+            return false;
+        }
+        T get_middle()const noexcept{
+            Node* slow = head->next;
+            Node* fast = head->next;
+            while(slow && fast && fast->next){
+                slow = slow->next;
+                fast = fast->next->next;
+            }
+            return slow->data;
+        }
     public:
         /**
          * @brief method untuk insertion val pada pos front
