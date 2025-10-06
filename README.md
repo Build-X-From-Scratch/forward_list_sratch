@@ -90,6 +90,10 @@ clang++ -stdc=c++20 example -o example
 | Assign         | ✅ Todo |
 | Merge          | ✅ Todo |
 
+## Develoment
+
+[![wakatime](https://wakatime.com/badge/user/04a3154f-bfdc-49e5-b523-80e1a082da81/project/804f8972-628e-4e17-82b2-c15648602c01.svg)](https://wakatime.com/badge/user/04a3154f-bfdc-49e5-b523-80e1a082da81/project/804f8972-628e-4e17-82b2-c15648602c01)
+
 ## License
 This project is licensed under the [MIT License](./LICENSE).  
 You are free to use, modify, and distribute it with proper attribution.
