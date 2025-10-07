@@ -94,6 +94,8 @@ clang++ -stdc=c++20 example -o example
 
 ![benchmark](docs/image.png)
 
+if you want read details benchmark,you can read in this [benchmark result](benchmark_result.md)
+
 ## Develoment
 
 [![wakatime](https://wakatime.com/badge/user/04a3154f-bfdc-49e5-b523-80e1a082da81/project/804f8972-628e-4e17-82b2-c15648602c01.svg)](https://wakatime.com/badge/user/04a3154f-bfdc-49e5-b523-80e1a082da81/project/804f8972-628e-4e17-82b2-c15648602c01)
