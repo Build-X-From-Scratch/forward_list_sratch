@@ -37,6 +37,8 @@ including various member functions, iterators, and algorithms such as sort, merg
 - **Compiler**: g++ 10+/clang++ 12+
 - **OS**: Linux(recomended),MacOS,Mikocok
 ## Instalation
+
+### 1.add header manual(not recomended)
 Clone this repo
 ```bash
 git clone https://github.com/Build-X-From-Scratch/forward_list_sratch.git
@@ -44,6 +46,47 @@ git clone https://github.com/Build-X-From-Scratch/forward_list_sratch.git
 ### copy header to your project
 ```bash
 cp -r forward_list_sratch/header/forward_list.hpp .
+```
+
+### 2. use CMake (Recomended)
+
+If your project uses CMake, you can integrate this library using `FetchContent`. Add the following code to your `CMakeLists.txt`:
+```cmake
+include(FetchContent)
+
+FetchContent_Declare(
+  forward_lists
+  GIT_REPOSITORY https://github.com/Build-X-From-Scratch/forward_list_sratch.git
+  GIT_TAG v1.0.0
+)
+FetchContent_MakeAvailable(forward_lists)
+```
+
+Then link the library to your executable:
+```cmake
+add_executable(${PROJECT_NAME} main.cpp)
+
+target_link_libraries(${PROJECT_NAME} PRIVATE forward_list)
+```
+
+#### CMakeLists complete example
+```cmake
+cmake_minimum_required(VERSION 3.14)
+project(MyProject)
+
+set(CMAKE_CXX_STANDARD 17)
+
+include(FetchContent)
+
+FetchContent_Declare(
+  forward_lists
+  GIT_REPOSITORY https://github.com/namamu/mystl.git
+  GIT_TAG v1.0.0
+)
+FetchContent_MakeAvailable(forward_lists)
+
+add_executable(${PROJECT_NAME} main.cpp)
+target_link_libraries(${PROJECT_NAME} PRIVATE forward_list)
 ```
 
 ## example 
