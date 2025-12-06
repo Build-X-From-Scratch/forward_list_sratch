@@ -21,9 +21,11 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+#include <sys/types.h>
 #include <functional>
 #include <iostream>
 #include <initializer_list>
+#include <stdexcept>
 #include <type_traits>
 #include <ranges>
 #include <iterator>
@@ -319,6 +321,17 @@ class forward_lists{
         }
         Iterator cbefore_begin()const{ //constant iterator
             return Iterator(head);
+        }
+        T& operator[](std::size_t pos){
+            if(pos == 0 || pos > size){
+                throw std::out_of_range("Error: pos invalid");
+            }
+            Node* nodes = head;
+            for(ssize_t i = 0;i < pos;++i){
+                if(!nodes)throw std::runtime_error("corrupt list");
+                nodes = nodes->next;
+            }
+            return nodes->data;
         }
     public: //getter
         /**

@@ -41,7 +41,12 @@ include(GoogleTest)
 gtest_discover_tests(forward_list_test)
 
 # ==== Benchmarking ====
-find_package(benchmark REQUIRED)
+FetchContent_Declare(
+    benchmark
+    GIT_REPOSITORY https://github.com/google/benchmark.git
+    GIT_TAG        main # Or a specific tag/commit
+)
+FetchContent_MakeAvailable(benchmark)
 
 add_executable(forward_list_bench
   benchmarking/benchmarking.cpp
