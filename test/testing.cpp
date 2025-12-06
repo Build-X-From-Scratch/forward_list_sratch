@@ -1065,3 +1065,9 @@ TEST(getter,middle_testing){
     int mid = list.get_middle();
     EXPECT_EQ(mid,3);
 }   
+TEST(operatorTesting,SubScriptI){
+    forward_lists<int>list = {1,2,3,4,5};
+    int expected = 3;
+    int actual = list[std::size_t(3)];
+    EXPECT_EQ(actual,expected);
+}
