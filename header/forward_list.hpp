@@ -22,6 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 #include <sys/types.h>
+#include <algorithm>
 #include <functional>
 #include <iostream>
 #include <initializer_list>
@@ -222,7 +223,12 @@ class forward_lists{
     private:
         class Iterator{
             private:
+                struct emp{
+                    forward_lists* p;  
+                };
+            private:
                 Node* node;
+                forward_lists* list;
             public:
                 /**
                  * @brief iterator category 
@@ -290,6 +296,15 @@ class forward_lists{
                 bool operator==(const Iterator& others)const{
                     return node == others.node;
                 }
+                bool operator<(const Iterator& others)const{
+                    return std::lexicographical_compare(list->begin(),list->end(),others.list->begin(),others.list->end());
+                }
+                bool operator>(const Iterator& others)const{
+                    return std::lexicographical_compare(others.list->begin(),others.list->end(),list->begin(),list->end());
+                }
+                bool operator<=>(const Iterator& others)const{
+                    return std::lexicographical_compare_three_way(list->begin(),list->end(),others.list->begin(),others.list->end());
+                }   
                 Node* get_raw()const{
                     return node;
                 }
@@ -1646,6 +1661,28 @@ class forward_lists{
             //update size
             size++;
         }
+    public:
+        void rotate_list(int k){
+            if(!head->next || k == 0 || !head){
+                return;
+            }
+            int n = size;
+            Node* fast = head;
+            k %= n;
+            if(k == 0)return;
+            for(int i = 0;i < k;i++){
+                fast = fast->next;
+            }
+            Node* slow = head;
+            while(fast->next){
+                fast = fast->next;
+                slow = slow->next;
+            }
+            //rotate
+            fast->next = head;
+            head = slow->next;
+            slow->next = nullptr;
+        }   
     public:
         void clear(){
             Node* curr = head->next;   // mulai dari setelah dummy
