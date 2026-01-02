@@ -21,8 +21,10 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+#include <gtest/gtest.h>
 #include <sys/types.h>
 #include <algorithm>
+#include <cassert>
 #include <functional>
 #include <iostream>
 #include <initializer_list>
@@ -338,11 +340,11 @@ class forward_lists{
             return Iterator(head);
         }
         T& operator[](std::size_t pos){
-            if(pos == 0 || pos > size){
+            if(pos == 0 || pos > std::size_t(size)){
                 throw std::out_of_range("Error: pos invalid");
             }
             Node* nodes = head;
-            for(ssize_t i = 0;i < pos;++i){
+            for(std::size_t i = 0;i < pos;++i){
                 if(!nodes)throw std::runtime_error("corrupt list");
                 nodes = nodes->next;
             }
@@ -1667,21 +1669,27 @@ class forward_lists{
                 return;
             }
             int n = size;
-            Node* fast = head;
             k %= n;
             if(k == 0)return;
+            assert(k >= 0 && k < n);
+            Node* fast = head;
+            Node* slow = head;
             for(int i = 0;i < k;i++){
+                assert(fast != nullptr);
                 fast = fast->next;
             }
-            Node* slow = head;
             while(fast->next){
                 fast = fast->next;
                 slow = slow->next;
             }
             //rotate
-            fast->next = head;
-            head = slow->next;
-            slow->next = nullptr;
+            Node* _next = slow->next;
+            slow->next = nullptr; //sekarang slow menunjuk null
+            assert(fast != nullptr);
+            assert(fast->next == nullptr);
+            fast->next = head->next; //linking last node dengan head
+            // ASSERT_EQ(fast,nullptr);
+            head->next = _next; //head harus menunjuk slow
         }   
     public:
         void clear(){
