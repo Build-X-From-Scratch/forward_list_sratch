@@ -1071,3 +1071,14 @@ TEST(operatorTesting,SubScriptI){
     int actual = list[std::size_t(3)];
     EXPECT_EQ(actual,expected);
 }
+TEST(rotate,rotatetesting){
+    forward_lists<int>list = {1,2,3,4,5};
+    int k = 2;
+    list.rotate_list(k);
+    std::vector<int>actual,expected;
+    expected = std::vector<int>{4,5,1,2,3};
+    for(auto x: list){
+        actual.push_back(x);
+    }
+    EXPECT_EQ(actual,expected);
+}
