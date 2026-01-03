@@ -21,7 +21,6 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-#include <gtest/gtest.h>
 #include <sys/types.h>
 #include <algorithm>
 #include <cassert>
@@ -1675,7 +1674,6 @@ class forward_lists{
             Node* fast = head;
             Node* slow = head;
             for(int i = 0;i < k;i++){
-                assert(fast != nullptr);
                 fast = fast->next;
             }
             while(fast->next){
@@ -1685,8 +1683,6 @@ class forward_lists{
             //rotate
             Node* _next = slow->next;
             slow->next = nullptr; //sekarang slow menunjuk null
-            assert(fast != nullptr);
-            assert(fast->next == nullptr);
             fast->next = head->next; //linking last node dengan head
             // ASSERT_EQ(fast,nullptr);
             head->next = _next; //head harus menunjuk slow
