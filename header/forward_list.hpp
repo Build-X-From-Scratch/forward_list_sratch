@@ -106,7 +106,7 @@ class forward_lists{
          * 
          */
         template <typename It>  
-        requires my_input_iterator<It>
+        requires std::input_iterator<It>
         forward_lists(It begin,It end){
             Node* new_node = _create_node(T{}); //create dummy node
             head = new_node;
@@ -780,7 +780,7 @@ class forward_lists{
             }   
         }   
         template<typename It>
-        requires my_input_iterator<It>
+        requires std::input_iterator<It>
         void assign(It itr1,It itr2){
             clear();
             Node* curr = head;
